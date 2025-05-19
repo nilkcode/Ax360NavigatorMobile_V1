@@ -39,6 +39,8 @@ const Home = () => {
     const [selecteSite, setSelectedSite] = useState(null)
     const [isOpenSiteDropDown, setIsOpenSiteDropDown] = useState(false)
     const [loading, setLoading] = useState(true)
+     const {user} = useSelector((state) => state.auth)
+    const {moduleId} = useSelector((state) => state.moduleId)
 
 
   const getModuleListBySId = async (SId) => {
@@ -59,8 +61,7 @@ const Home = () => {
     };
 
 
-    const {user} = useSelector((state) => state.auth)
-    const {moduleId} = useSelector((state) => state.moduleId)
+   
 
    
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native'
+import { View, Text,ScrollView, StyleSheet,useWindowDimensions } from 'react-native'
 import React,{useState, useRef} from 'react'
 
 const StickyHeader = () => {

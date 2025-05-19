@@ -22,7 +22,7 @@ import {
 import "./global.css"
 import Button from './src/components/Buttons/Button';
 // import { useColorScheme } from 'nativewind';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ThemeProvider ,{ useTheme } from './src/contexts/ThemeContext';
 import Main from './Main';
 import { Provider } from 'react-redux';
@@ -32,14 +32,15 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 function App() {
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider >
-          <Main />
-        </ThemeProvider>
-      </PersistGate>
-
-    </Provider>
+    <GestureHandlerRootView>
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <ThemeProvider >
+            <Main />
+          </ThemeProvider>
+        </PersistGate>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 
