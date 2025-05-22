@@ -47,13 +47,12 @@ const Footer = ({ activeRoute = "home" }) => {
                   </TouchableOpacity>
               </View>
 
-              <View style={{borderRadius:'50%',top:-50,right:160}} className="absolute
-               w-24 h-24 bg-blue-500 justify-center" >
+              <View style={{borderRadius:50,top:-42,right:160 , borderColor:'#fff',borderWidth:6}} className="absolute
+               w-24 h-24 bg-blue-600 justify-center " >
                   <View className="flex justify-center items-center" >
                       <TouchableOpacity
                           activeOpacity={0.8}
-                          onPress={() => navigatationHandler(0)}
-                      >
+                          onPress={() => navigatationHandler(0)}>
                           <Text className="text-white"><Icon className="relative left-0" name="plus" size={40} /></Text>
                       </TouchableOpacity>
                   </View>
