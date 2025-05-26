@@ -1,4 +1,4 @@
-import { View, Text, FlatList, ActivityIndicator } from 'react-native'
+import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import Header from '../../components/Header'
 import { screenLayout } from '../../styles/style'
@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import Octicons from 'react-native-vector-icons/Octicons'
 import Button from '../../components/Buttons/Button'
 import PillScrollFilter from '../../components/PillScrollFilter'
+import SearchInputBox from '../../components/InputsTextBox/SearchInputBox'
 
 
 const safetyList = [
@@ -34,24 +35,16 @@ const WomGembaExerciseList = () => {
   const [loading, setLoading] = useState(true)
   const [dataLoader, setDataLoader] = useState(false)
   const [isShowWarningDailog, setWarningDailog] = useState(false)
+  const [searchQuery , setSearchQuery] = useState('')
   const Limit = 10
 
 
 const categories = [
-  { label: 'All', value: 'all', color: '#9CA3AF' },       // neutral gray
-  { label: 'Tech', value: 'tech', color: '#3B82F6' },     // blue
-  { label: 'Health', value: 'health', color: '#10B981' }, // green
-  { label: 'Sports', value: 'sports', color: '#F59E0B' }, // amber
-  { label: 'Finance', value: 'finance', color: '#8B5CF6' }, // purple
-  { label: 'Travel', value: 'travel', color: '#EF4444' }, // red
-  { label: 'Food', value: 'food', color: '#EC4899' },     // pink
-  { label: 'Education', value: 'education', color: '#0EA5E9' }, // sky blue
-  { label: 'Movies', value: 'movies', color: '#14B8A6' }, // teal
-  { label: 'Music', value: 'music', color: '#F43F5E' }    // rose
+  { label: 'All', value: 'all', color: '' },       // neutral gray
+  { label: 'Completed', value: 'Completed', color: '#16a34a' }, // green
+  { label: 'Pending', value: 'Pending', color: '#a3a3a3' }, // amber
+  
 ];
-
-
-  console.log(user)
 
   useEffect(() => {
     getCaseStudyListBySId()
@@ -113,35 +106,47 @@ const categories = [
     ) : null
   );
 
+  const handleFilterExercise = (items) => {
+    
+  }
 
+  const handlePressMenuList = (item) => {
+    Alert.alert(item)
+  }
 
+  const handleSearch = (text) => {
+    debugger
+    const filterData = caseStudyList.filter((filterItem) => filterItem.objectId?.toString().includes(text)  || filterItem.description?.toLowerCase().includes(text.toLowerCase()))
+    setSearchQuery(text)   
+    setCaseStudyListVisibleList(filterData)
+  }
 
+  console.log(searchQuery)
 
+  console.log(caseStudyListVisibleList)
+  
   console.log(caseStudyList)
+
   return (
     <>
       <Header back={true} leftActionTitle="Home" rightActionTitle="Home2" headerTitle="Exercises" />
+ 
+       <SearchInputBox placeholder='Search Here..' onSearch={handleSearch}/>
 
-      
-
-            <PillScrollFilter data={categories} labelName={'label'} color={'color'} />
-        
-     
-
-
+      {/* <View className="py-5">
+          <PillScrollFilter data={categories} labelName={'label'} color={'color'} handlePress={handleFilterExercise} />
+      </View> */}
       <View className="px-4 flex flex-1">
         <FlatList contentContainerStyle={{ paddingBottom: 70 }} data={caseStudyListVisibleList}
           keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
-          renderItem={({ item }) => <WomGembaExerciseListCard studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description} />}
+          renderItem={({ item }) => <WomGembaExerciseListCard handlePressMenu={handlePressMenuList} objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
+            itemIsCompleted={item.isCompleted} />}
           onEndReached={loadMoreList}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
         />
       </View>
-
       <Footer />
-
-
       <DailogModal show={isShowWarningDailog}  >
         <View className="flex-row items-center mb-2">
           <Text className=""><Icon className="text-green-800" color={'#ca8a04'} name="warning" size={40} /></Text>

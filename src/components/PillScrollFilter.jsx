@@ -3,19 +3,19 @@ import React from 'react'
 import {  } from 'react-native-gesture-handler'
 import Icon from  'react-native-vector-icons/FontAwesome'
 
-const PillScrollFilter = ({children, labelName ,data,color}) => {
+const PillScrollFilter = ({children, labelName ,data,color,handlePress}) => {
   return (
     <> 
      
-      <View className="flex-row p-4 gap-2" >
+      <View className="flex-row  gap-2" >
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.scrollContainer}>
           {
             data.map((item, index) => (
-              <TouchableOpacity key={index}>
+              <TouchableOpacity key={index} onPress={() => handlePress(item[labelName])}>
                  
-                <View className="bg-neutral-300 px-6 p-2 rounded-lg mx-1 flex-row items-center gap-2"> 
-                  <Icon name='circle' size={15} color={item[color]} />
+                <View className="bg-neutral-200 px-6 p-2 rounded-lg mx-1 flex-row items-center gap-2"> 
+                  {item.color && <Icon name='circle' size={20} color={item[color]} />}
                   <Text>{item[labelName]}</Text>
                 </View>
               </TouchableOpacity>
