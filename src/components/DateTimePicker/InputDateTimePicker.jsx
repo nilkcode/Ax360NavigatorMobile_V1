@@ -8,13 +8,21 @@ import Icon  from 'react-native-vector-icons/FontAwesome5';
 import dayjs from 'dayjs';
 
 
-const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateChange,onTimeChange }) => {
+const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateChange, onTimeChange }) => {
 
-  // for PickerType = "calendar"
+    // for PickerType = "calendar"
     // for PickerType = "calendarTime"
-
-
     const {theme} = useTheme();
+    const [show, setShow] = useState(false);    // MODEL DAILOG OPEN State 
+
+     const currentDate = dayjs().format('MMMM D, YYYY');
+     console.log(currentDate)
+
+
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedTime, setSelectedTime] = useState(null)
+
+   
 
 
     const calendarCssClass = {
@@ -42,13 +50,12 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
         
     }
 
+ 
+
    
 
   
 
-    const [show, setShow] = useState(false);    // MODEL DAILOG OPEN State 
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedTime, setSelectedTime] = useState(null)
 
     const handleOpenCalendarDailog = () => {
       setShow(true)
@@ -64,7 +71,7 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
         setShow(false);
       
         if(onDateChange) {
-           onDateChange( dayjs(date).format('DD-MM-YYYY') ,)
+           onDateChange( dayjs(date).format('MMMM D, YYYY') ,)
         }
         
       }
@@ -86,17 +93,17 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
 
   return (
     <>
-    <View className="pb-6 relative">
+    <View className="relative">
       {/* <View className="">
          <Text className={`text-lg font-normal ${themes[theme].formLabel} mb-2 mx-6`}>Please Select Date</Text>
       </View> */}
       {
        pickerType === "calendar" &&  
         <TouchableOpacity onPress={handleOpenCalendarDailog}
-        className={`flex-row items-center justify-between py-1 px-5  rounded-full   ${themes[theme].bgPrimary}  border  ${themes[theme].border}   text-base font-medium`}>
+        className={`flex-row items-center justify-between  h-[50px] px-5  rounded-full   ${themes[theme].bgPrimary}  border  ${themes[theme].border}   text-base font-medium`}>
          <TextInput  className={`text-lg font-normal ${themes[theme].formInput}  `}
           placeholderTextColor={`${theme === "light" ? 'black' : '#fff5'}`}
-         value={selectedDate ?  dayjs(selectedDate).format('DD-MM-YYYY') :'' }
+         value={selectedDate ? dayjs(selectedDate).format('MMMM D, YYYY') : ''}
          placeholder='Please select date'  editable={false} >
            </TextInput>
            <Text className={`${themes[theme].formInput}`}><Icon name='calendar' size={18}  /></Text>
@@ -107,7 +114,7 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
         
         pickerType === "calendarTime" &&
           <TouchableOpacity onPress={handleOpenCalendarDailog}
-            className={`flex-row items-center justify-between py-1 px-5  rounded-full   ${themes[theme].bgPrimary}  border  ${themes[theme].border}   text-base font-medium`}>
+            className={`flex-row items-center justify-between  h-[50px] px-5  rounded-full   ${themes[theme].bgPrimary}  border  ${themes[theme].border}   text-base font-medium`}>
             <TextInput className={`text-lg font-normal ${themes[theme].formInput}  `}
               placeholderTextColor={`${theme === "light" ? '#9ca3af' : '#9ca3af'}`}
               value={selectedTime ? dayjs(selectedTime).format('HH:mm') : ''}

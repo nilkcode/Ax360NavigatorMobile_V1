@@ -1,9 +1,9 @@
 
-import { View, Text, TextInput, TouchableOpacity , FlatList, Modal, StyleSheet} from 'react-native'
+import { View, Text, TextInput, TouchableOpacity , FlatList, Modal, StyleSheet, Alert} from 'react-native'
 import React,{useState} from 'react'
 import { useTheme } from '../../contexts/ThemeContext';
 import { themes } from '../../contexts/theme';
-const DropDownBox = ({data = [], dropdownLabel ,dropDownValue ,placeholder = 's', onSelect, selectedValue}) => {
+const DropDownBox = ({data = [], dropdownLabel ,dropDownValue ,placeholder = 's', onSelect, selectedValue, }) => {
   
   const[visible, setVisible] = useState(false);
   const [selectedSiteValue, setSelectedSiteValue] = useState(selectedValue)
@@ -22,12 +22,16 @@ const DropDownBox = ({data = [], dropdownLabel ,dropDownValue ,placeholder = 's'
      setSearch('')
   }
 
+  const handlePressDropDown = () => {
+      setVisible(true);
+  }
+
   return (
     <>
        <View >
            {/* {label && <Text className="" style={styles.label}>{label}</Text>} */}
 
-           <TouchableOpacity onPress={() => setVisible(true)} 
+           <TouchableOpacity onPress={handlePressDropDown} 
             className={`border border-gray-700 flex flex-col justify-center ${themes[theme].formInput}  ${themes[theme].bgPrimary}
                     px-4 h-[50px] text-lg  rounded-full `}>
                <Text className={`${themes[theme].formInput}`} >

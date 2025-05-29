@@ -16,6 +16,7 @@ import Home from './src/common/screens/Home'
 import Loader from './src/components/Loaders/Loader';
 import { useSelector } from 'react-redux';
 import WomGembaExerciseList from './src/wom/screens/WomGembaExerciseList';
+import WomGembaExerciseAddEdit from './src/wom/screens/WomGembaExerciseAddEdit';
 
 const Stack = createNativeStackNavigator()
 
@@ -64,6 +65,9 @@ const Main = ({}) => {
             <Stack.Screen name='login' component={Login} screenOptions={{ headerShown: false, }} />
             <Stack.Screen name='home' component={Home} screenOptions={{ headerShown: false }} />
             <Stack.Screen name='/wom-mob-gemba-exercise-list' component={WomGembaExerciseList}
+             options={{ headerShown: false ,title:'Exercise'}}
+              />
+               <Stack.Screen name='wom-mob-gemba-exercise-add-edit' component={WomGembaExerciseAddEdit}
              options={{ headerShown: false ,title:'Exercise'}}
               />
           </Stack.Group>

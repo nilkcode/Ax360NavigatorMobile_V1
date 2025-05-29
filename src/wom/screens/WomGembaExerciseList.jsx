@@ -2,7 +2,7 @@ import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import Header from '../../components/Header'
 import { screenLayout } from '../../styles/style'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import womServices from '../../services/wom/womService'
 import WomGembaExerciseListCard from '../components/WomGembaExerciseListCard'
 import Loader from '../../components/Loaders/Loader'
@@ -13,6 +13,9 @@ import Octicons from 'react-native-vector-icons/Octicons'
 import Button from '../../components/Buttons/Button'
 import PillScrollFilter from '../../components/PillScrollFilter'
 import SearchInputBox from '../../components/InputsTextBox/SearchInputBox'
+import { useNavigation } from '@react-navigation/native'
+import { setLastScreen } from '../../redux/slices/navigationSlices'
+
 
 
 const safetyList = [
@@ -36,7 +39,10 @@ const WomGembaExerciseList = () => {
   const [dataLoader, setDataLoader] = useState(false)
   const [isShowWarningDailog, setWarningDailog] = useState(false)
   const [searchQuery , setSearchQuery] = useState('')
+  const navigation  = useNavigation()
   const Limit = 10
+
+  const dispatch = useDispatch()
 
 
 const categories = [
@@ -110,8 +116,14 @@ const categories = [
     
   }
 
-  const handlePressMenuList = (item) => {
-    Alert.alert(item)
+
+
+  const handlePressMenuList = () => {
+
+  }
+
+  const handlePressDescription = () => {
+    Alert.alert("Handle press description list")
   }
 
   const handleSearch = (text) => {
@@ -121,11 +133,6 @@ const categories = [
     setCaseStudyListVisibleList(filterData)
   }
 
-  console.log(searchQuery)
-
-  console.log(caseStudyListVisibleList)
-  
-  console.log(caseStudyList)
 
   return (
     <>
@@ -139,14 +146,14 @@ const categories = [
       <View className="px-4 flex flex-1">
         <FlatList contentContainerStyle={{ paddingBottom: 70 }} data={caseStudyListVisibleList}
           keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
-          renderItem={({ item }) => <WomGembaExerciseListCard handlePressMenu={handlePressMenuList} objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
+          renderItem={({ item }) => <WomGembaExerciseListCard handlePressDescription={handlePressDescription} handlePressMenu={handlePressMenuList} objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
             itemIsCompleted={item.isCompleted} />}
           onEndReached={loadMoreList}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
         />
       </View>
-      <Footer />
+      <Footer  />
       <DailogModal show={isShowWarningDailog}  >
         <View className="flex-row items-center mb-2">
           <Text className=""><Icon className="text-green-800" color={'#ca8a04'} name="warning" size={40} /></Text>

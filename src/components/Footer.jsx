@@ -2,23 +2,25 @@ import { View,Text, TouchableOpacity } from "react-native";
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import  Icon  from "react-native-vector-icons/Feather";
+import { useDispatch } from "react-redux";
+import { setLastScreen } from "../redux/slices/navigationSlices";
 
 const Footer = ({ activeRoute = "home" }) => {
   const navigate = useNavigation();
+
+  const dispatch = useDispatch()
 
 
   const navigatationHandler = (key) => {
     switch (key) {
       case 0:
-        navigate.navigate("home");
+         dispatch(setLastScreen('wom-mob-gemba-exercise-add-edit')) 
+          navigate.navigate('wom-mob-gemba-exercise-add-edit')
         break;
       case 1:
-        navigate.navigate("cart");
+        navigate.navigate("home");
         break;
-      case 2:
-        if (isAuthenticated) navigate.navigate("profile");
-        else navigate.navigate("login");
-        break;
+     
       default:
         navigate.navigate("home");
         break;

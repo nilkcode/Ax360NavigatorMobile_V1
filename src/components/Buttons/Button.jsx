@@ -20,8 +20,8 @@ const  Button = ({ title,
  
      const sizeStyle = {
          small:  'py-2 px-4 text-sm' ,
-         medium:  'py-3 px-6 text-lg',
-         large:  'py-4 px-8 text-lg ',
+         medium:  'py-4 px-6 text-lg',
+         large:  'py-5 px-8 text-lg ',
          fabSmall:'w-16 h-16 rouded-full',
          fabMedium:'w-20 h-20  rouded-full',
          fabLarge:'w-24 h-24 rounded-full ',
@@ -45,7 +45,7 @@ const  Button = ({ title,
   }
 
   // Apply block class if block prop is true
-  const blockStyle = block ? 'w-full' : '';
+  const blockStyle = block ? 'w-full ' : '';
 
   const isFab = size.includes('fab') || (!title && icon)
 

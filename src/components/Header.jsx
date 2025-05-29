@@ -14,7 +14,7 @@ const Header = ({back = false , leftActionTitle="" ,rightActionTitle="" ,headerT
   return (
     <>
       <View  style={{ paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0, }}>
-        <View className="p-2  h-16  w-full bg-w-400 flex flex-row flex-grow-1 items-center justify-between content-center bg-white elevation-lg">
+        <View className="p-2  h-16  w-full bg-w-400 flex flex-row flex-grow-1 items-center justify-between content-center bg-white ">
           <TouchableOpacity className="flex flex-row relative  w-1/5 " onPress={() => navigate.goBack()}>
             <View className="flex-row items-center text-right" >
               {back && <Text className={`${themes[theme].formLabel} `}>

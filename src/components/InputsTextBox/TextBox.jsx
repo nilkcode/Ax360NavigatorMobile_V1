@@ -10,7 +10,8 @@ const TextBox = ({
     errorMessage = "Please Enter Valid input",
     value = "",
     onChangeText = () => {},
-    inputType="text"
+    inputType="text",
+    customeClass
 
 }
 ) => {
@@ -65,16 +66,15 @@ const TextBox = ({
        <>
           <View className="relative">
               <TextInput
+                
                 value={value}
                 onChangeText={validationInput}
                 keyboardType={getKeyboardType()}
                 secureTextEntry={inputType === "password"}
                 placeholder={placeholder}
                 // style={{borderColor: isFocused ? `#3b82f6` :' '}}  
-                  className={
-                    `border border-gray-700  ${themes[theme].formInput} 
-                    ${themes[theme].bgPrimary} ${isFocused && `border-blue-500 border`}
-                    ${isValidation && error && `border-red-500` }
+                  className={ `border border-gray-700 ${customeClass}  ${themes[theme].formInput} ${themes[theme].bgPrimary} ${isFocused && `border-blue-500 border`}
+                  ${isValidation && error && `border-red-500` }
                     px-4 h-[50px] text-lg font-medium rounded-full `} // ✅ Using the variable here
                    onFocus={() =>  setIsFocused(true)}
                   onBlur={() => setIsFocused(false)} // Ensure onBlur to reset focus

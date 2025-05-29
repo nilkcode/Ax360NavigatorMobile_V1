@@ -5,7 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext'
 import { themes } from '../../contexts/theme'
 import  Icon  from 'react-native-vector-icons/Entypo'
 
-const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,description,itemIsCompleted,handlePressMenu}) => {
+const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,description,itemIsCompleted, handlePressDescription,handlePressMenu}) => {
 
  const {theme}  = useTheme()
 
@@ -15,9 +15,9 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
               <View className="flex-col gap-1 p-2 justify-between">
                   <View className="flex-row  justify-between">
                      <Text className={`${themes[theme].textPrimary} text-base font-medium`}>{objectId}</Text>
-                     <View className='flex-row gap-2 items-center'>
+                     <View className='flex-row gap-2 items-center '>
                         <Text className={`${themes[theme].textPrimary} text-base font-medium  `}>{formatedStudyDate}</Text>
-                       <TouchableOpacity onPress={handlePressMenu}><Icon name='dots-three-vertical' size={15}  /></TouchableOpacity> 
+                       <TouchableOpacity onPress={handlePressMenu} className="pl-2"><Icon name='dots-three-vertical' size={16}  /></TouchableOpacity> 
                      </View>
                      
                   </View>
@@ -27,7 +27,7 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
                      
                   </View>
                   <View >
-                      <Text className={`${themes[theme].textPrimary} text-base font-medium !text-blue-600`}>{description}</Text>
+                     <TouchableOpacity onPress={handlePressDescription}> <Text className={`${themes[theme].textPrimary} text-base font-medium !text-blue-600`}>{description}</Text></TouchableOpacity>
                   </View>
               </View>
       </Cards>
