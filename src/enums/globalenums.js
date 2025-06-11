@@ -9,9 +9,9 @@ export var role = {
 };
 
 export var workType = [
-  { id: 0, name: "PM" },
-  { id: 1, name: "CM" },
-  { id: 2, name: "RM" }
+  { id: 1, name: "PM" },
+  { id: 2, name: "CM" },
+  { id: 3, name: "RM" }
 ];
 
 export var studyType = [

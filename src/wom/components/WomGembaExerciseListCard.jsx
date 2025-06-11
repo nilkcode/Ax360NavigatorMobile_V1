@@ -17,7 +17,7 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
                      <Text className={`${themes[theme].textPrimary} text-base font-medium`}>{objectId}</Text>
                      <View className='flex-row gap-2 items-center '>
                         <Text className={`${themes[theme].textPrimary} text-base font-medium  `}>{formatedStudyDate}</Text>
-                       <TouchableOpacity onPress={handlePressMenu} className="pl-2"><Icon name='dots-three-vertical' size={16}  /></TouchableOpacity> 
+                       <TouchableOpacity onPress={handlePressMenu} className="pl-2"><Text><Icon name='dots-three-vertical' size={16}  /></Text></TouchableOpacity> 
                      </View>
                      
                   </View>

@@ -67,7 +67,8 @@ const Home = () => {
   useEffect(() => {
       if (!user) return;
       if (user.isCompanyAccess === true) {
-        dispatch(fetchCompanyList());
+        //  dispatch(fetchCompanyList());
+        return 
       } else {
     
          if(selecteSite) {
@@ -136,7 +137,7 @@ const Home = () => {
     const handleCloseSiteDropDown = () => {
        setIsOpenSiteDropDown(false)
     }
-    const handlePressEvent = (item) => {debugger
+    const handlePressEvent = (item) => {
        dispatch(removeModuleId(item.moduleId));
        dispatch(setModuleId(item.moduleId))
        dispatch(setLastScreen(item.redirectURL))

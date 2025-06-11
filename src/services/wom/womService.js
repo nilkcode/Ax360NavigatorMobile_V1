@@ -8,6 +8,16 @@ const womServices = {
     },
 
 
+    insertOrUpdateCaseStudyDetails: async (obj) => {
+        const response = await apiClient.post('/api/wom/insertOrUpdateCaseStudyDetails', obj)
+        return response;
+    }
+
+
+
+
+
+
 
 }
 

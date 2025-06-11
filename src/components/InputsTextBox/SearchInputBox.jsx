@@ -24,7 +24,6 @@ const SearchInputBox = ({ placeholder = 'Search...', onSearch, delay = 300, styl
      onSearch('')
   }
     const focusInput = () => {
-     Alert.alert("focuse")
     inputRef.current?.focus();
      setSearchText(text)
   };
@@ -43,9 +42,10 @@ const SearchInputBox = ({ placeholder = 'Search...', onSearch, delay = 300, styl
         value={searchText}
       /> 
       <View className="flex-row justify-center ">
-         {searchText.length > 0  ?   
-         <TouchableOpacity> <Icon name='close' size={23}  color={'#f87171'} onPress={handleClearText} /> </TouchableOpacity>
-        : <TouchableOpacity onPress={focusInput}><Icon name='search' size={23}  color={'#a3a3a3'} /></TouchableOpacity> }
+         { searchText.length > 0  ?    
+         <TouchableOpacity> <Icon name='close' size={23}  color={'#f87171'} onPress={handleClearText} />
+          </TouchableOpacity>  : <TouchableOpacity onPress={focusInput}><Icon name='search' size={23}  color={'#a3a3a3'} /></TouchableOpacity> 
+          }
       </View>
       
       

@@ -15,14 +15,10 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
     const {theme} = useTheme();
     const [show, setShow] = useState(false);    // MODEL DAILOG OPEN State 
 
-     const currentDate = dayjs().format('MMMM D, YYYY');
-     console.log(currentDate)
+    const initialDate = new Date()
 
-
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedDate, setSelectedDate] = useState(initialDate);
     const [selectedTime, setSelectedTime] = useState(null)
-
-   
 
 
     const calendarCssClass = {
@@ -50,7 +46,10 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
         
     }
 
- 
+    
+    useEffect(() => {
+      if (initialDate) setSelectedDate(new Date(initialDate));
+    },[])
 
    
 
@@ -65,13 +64,15 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
 
 
 
+    
     const handleDateChange = ({ date,time }) => {
       if (date instanceof Date) {
-        setSelectedDate(date);
+        setSelectedDate(new Date(date));
         setShow(false);
       
         if(onDateChange) {
-           onDateChange( dayjs(date).format('MMMM D, YYYY') ,)
+          //  onDateChange(dayjs(date).format('MMMM D, YYYY') ,)
+          onDateChange(dayjs(new Date(date)))
         }
         
       }

@@ -15,6 +15,7 @@ import PillScrollFilter from '../../components/PillScrollFilter'
 import SearchInputBox from '../../components/InputsTextBox/SearchInputBox'
 import { useNavigation } from '@react-navigation/native'
 import { setLastScreen } from '../../redux/slices/navigationSlices'
+import { fetchExercises } from '../../redux/slices/exerciseSlice'
 
 
 
@@ -29,55 +30,37 @@ const safetyList = [
 
 
 const WomGembaExerciseList = () => {
+  const dispatch = useDispatch()
 
-  const { moduleId } = useSelector((state) => state.moduleId)
   const { user } = useSelector((state) => state.auth)
-  const [caseStudyList, setCaseStudyList] = useState([])
   const [caseStudyListVisibleList, setCaseStudyListVisibleList] = useState([])
   const [hasMore, setHasMore] = useState(true)
-  const [loading, setLoading] = useState(true)
   const [dataLoader, setDataLoader] = useState(false)
   const [isShowWarningDailog, setWarningDailog] = useState(false)
   const [searchQuery , setSearchQuery] = useState('')
   const navigation  = useNavigation()
   const Limit = 10
+ const { exerciseList,loading, error} = useSelector((state) => state.exercises);
+ 
 
-  const dispatch = useDispatch()
-
-
-const categories = [
-  { label: 'All', value: 'all', color: '' },       // neutral gray
-  { label: 'Completed', value: 'Completed', color: '#16a34a' }, // green
-  { label: 'Pending', value: 'Pending', color: '#a3a3a3' }, // amber
-  
-];
 
   useEffect(() => {
+    var idDto = {
+      id: user?.companyId,
+      id1: user?.siteId
+    }
+
+    dispatch(fetchExercises(idDto))
     getCaseStudyListBySId()
-  }, [])
+  }, [dispatch])
+
+
+
 
   const getCaseStudyListBySId = async () => {
-
-    setLoading(true)
-
-    var idDto = {
-      id: user.companyId,
-      id1: user.siteId
-    }
-    try {
-      const response = await womServices.getCaseStudyListBySId(idDto)
-      const data = response.data;
-
-      setCaseStudyList(data);
-      setCaseStudyListVisibleList(data.slice(0, Limit));
+      setCaseStudyListVisibleList(exerciseList.slice(0, Limit));
       setWarningDailog(true)
-      if (data.length <= Limit) setHasMore(false)
-
-    } catch (error) {
-      console.error('API fetch error:', error);
-    } finally {
-      setLoading(false)
-    }
+      if (exerciseList.length <= Limit) setHasMore(false)
   };
 
   const loadMoreList = () => {
@@ -87,7 +70,7 @@ const categories = [
     setTimeout(() => {
       const start = caseStudyListVisibleList.length;
       const end = start + Limit;
-      const nextItems = caseStudyList.slice(start, end);
+      const nextItems = exerciseList.slice(start, end);
 
       if (nextItems.length === 0) {
         setHasMore(false);
@@ -97,7 +80,7 @@ const categories = [
 
       setCaseStudyListVisibleList(prev => [...prev, ...nextItems]);
 
-      if (end >= caseStudyList.length) {
+      if (end >= exerciseList.length) {
         setHasMore(false);
       }
       setDataLoader(false);
@@ -105,38 +88,27 @@ const categories = [
   }
 
   const renderFooter = () => (
-    dataLoader ? (
+    loading ? (
       <View className="flex justify-center">
         <ActivityIndicator size="large" color="#007BFF" />
       </View>
     ) : null
   );
 
-  const handleFilterExercise = (items) => {
-    
-  }
-
-
-
-  const handlePressMenuList = () => {
-
-  }
-
-  const handlePressDescription = () => {
-    Alert.alert("Handle press description list")
-  }
+ 
 
   const handleSearch = (text) => {
-    debugger
-    const filterData = caseStudyList.filter((filterItem) => filterItem.objectId?.toString().includes(text)  || filterItem.description?.toLowerCase().includes(text.toLowerCase()))
+    const filterData = exerciseList.filter((filterItem) => filterItem.objectId?.toString().includes(text)  || filterItem.description?.toLowerCase().includes(text.toLowerCase()))
     setSearchQuery(text)   
     setCaseStudyListVisibleList(filterData)
   }
 
 
+console.log(exerciseList)
+
   return (
     <>
-      <Header back={true} leftActionTitle="Home" rightActionTitle="Home2" headerTitle="Exercises" />
+      <Header back={true} backScreen={'home'} leftActionTitle="Home" rightActionTitle="Home2" headerTitle="Exercises" />
  
        <SearchInputBox placeholder='Search Here..' onSearch={handleSearch}/>
 
@@ -145,13 +117,14 @@ const categories = [
       </View> */}
       <View className="px-4 flex flex-1">
         <FlatList contentContainerStyle={{ paddingBottom: 70 }} data={caseStudyListVisibleList}
-          keyExtractor={(item, index) => item.id?.toString() ?? index.toString()}
-          renderItem={({ item }) => <WomGembaExerciseListCard handlePressDescription={handlePressDescription} handlePressMenu={handlePressMenuList} objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
+         keyExtractor={(item, index) => (item.id ? item.id.toString() : `index-${index}`)}
+          renderItem={({ item }) => <WomGembaExerciseListCard  objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
             itemIsCompleted={item.isCompleted} />}
           onEndReached={loadMoreList}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
         />
+        {/* handlePressDescription={handlePressDescription} handlePressMenu={handlePressMenuList} */}
       </View>
       <Footer  />
       <DailogModal show={isShowWarningDailog}  >
@@ -161,8 +134,8 @@ const categories = [
         </View>
         {
           safetyList.map((item, index) => (
-            <View className="flex-row items-start p-4 gap-1 " key={index}>
-              <Octicons className="text-green-800 px-1 py-1" color={'black'} name="dot-fill" size={12} />
+            <View className="flex-row items-start  p-4 gap-1 " key={index}>
+             <Text><Octicons className="text-green-800 px-1 py-1" color={'black'} name="dot-fill" size={12} /></Text> 
               <Text className='flex-row gap-2 leading-5'>
                 {item.saftyDescription}
               </Text>

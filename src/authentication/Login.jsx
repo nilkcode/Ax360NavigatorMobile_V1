@@ -97,7 +97,7 @@ const Login = () => {
       
         try {
             let encryptedPsw = encryptData(password)
-            await dispatch(loginUser({ userName, password: encryptedPsw, accessCode, isFromLogIn: true , })).unwrap()
+            await dispatch(loginUser({ userName, password: encryptedPsw, accessCode, isFromLogIn: true })).unwrap()
             dispatch(setLastScreen("home"))
             navigation.navigate("home");
             Toast.show({

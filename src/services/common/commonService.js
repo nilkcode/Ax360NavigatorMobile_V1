@@ -25,6 +25,16 @@ const commonServices = {
        return response;
     },
 
+    getCraftListBySId:async (obj) => {
+         const response = await apiClient.post(`/api/cmn/getCraftListBySId`,obj)
+       return response;
+    }
+
+
+//       getCraftListByObjectId(idDto: { id21: number; id22: number, id23: number, id51: boolean, id67: string, id24: number, id25: number }): Promise<CraftList[]> {
+//     return firstValueFrom(this.http.post<CraftList[]>(`${serviceConfig.apiUrl}/api/cmn/getCraftListByObjectId`, idDto));
+//   }
+
   
 
    

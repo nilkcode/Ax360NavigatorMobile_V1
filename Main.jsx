@@ -1,4 +1,4 @@
-import { View, Text,useColorScheme, } from 'react-native'
+import { View, Text,useColorScheme, ActivityIndicator} from 'react-native'
 import React, { useReducer, useState ,useEffect} from 'react'
 import Toast from "react-native-toast-message";
   
@@ -35,25 +35,41 @@ const Main = ({}) => {
  
   useEffect(() => {
     const now = Date.now();
-    const diff = (now - lastActiveTime) / 60000 // minutes
+     const diff = lastActiveTime ? (now - lastActiveTime) / 60000 : Infinity // in minutes
+
 
     if (!isAuthenticated) {
       setInitialRoute('login')
     } else if (diff > 5) {
       setInitialRoute('home')
-    } else {
-      setInitialRoute(lastScreen || 'login')
+    } else {     
+       setInitialRoute(lastScreen || 'login')
     }
+
+
+    // fallback timeout to prevent stuck loader 
+    const timeout =  setTimeout(() => {
+       if(!initialRoute){
+        setInitialRoute('login')
+       }
+    },3000)
+
+     return () => clearTimeout(timeout)
 
     
    
   
 
-  }, [isAuthenticated])
+  }, [isAuthenticated, lastScreen, lastActiveTime])
 
   
-  if(!initialRoute) {
-    return <Loader/>
+ // 👉 Wait until initialRoute is set
+  if (!initialRoute) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (

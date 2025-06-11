@@ -3,8 +3,7 @@ import { View, Text, TextInput, TouchableOpacity , FlatList, Modal, StyleSheet, 
 import React,{useState} from 'react'
 import { useTheme } from '../../contexts/ThemeContext';
 import { themes } from '../../contexts/theme';
-const DropDownBox = ({data = [], dropdownLabel ,dropDownValue ,placeholder = 's', onSelect, selectedValue, }) => {
-  
+const DropDownBox = ({data = [], dropdownLabel ,dropDownValue ,placeholder = '', onSelect, selectedValue, }) => {
   const[visible, setVisible] = useState(false);
   const [selectedSiteValue, setSelectedSiteValue] = useState(selectedValue)
   const [search, setSearch] = useState('')

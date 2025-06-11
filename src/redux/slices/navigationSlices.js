@@ -7,7 +7,7 @@ const navigationSlice = createSlice({
         lastActiveTime:Date.now(),
     },
     reducers:{
-        setLastScreen:(state, action) => {debugger
+        setLastScreen:(state, action) => {
             state.lastScreen  = action.payload;
             state.lastActiveTime = Date.now()
         }

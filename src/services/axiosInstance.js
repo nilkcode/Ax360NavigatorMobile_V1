@@ -26,6 +26,7 @@ apiClient.interceptors.request.use(
   
       if (!isLoginRequest && currentUser) {
         config.headers.Authorization = `Bearer ${currentUser.access_token}`;
+        config.headers[`X-Session-Token`] =  currentUser.currentSessionToken || '';
         config.headers.DomainName = currentUser.domainName;
         config.headers.AccessCode = currentUser.accessCode;
         config.headers['Cache-Control'] = 'no-cache';
