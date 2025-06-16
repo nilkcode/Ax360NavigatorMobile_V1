@@ -39,7 +39,7 @@ const Home = () => {
     const [selecteSite, setSelectedSite] = useState(null)
     const [isOpenSiteDropDown, setIsOpenSiteDropDown] = useState(false)
     const [loading, setLoading] = useState(true)
-     const {user} = useSelector((state) => state.auth)
+     const {user,isAuthenticated} = useSelector((state) => state.auth)
     const {moduleId} = useSelector((state) => state.moduleId)
 
 
@@ -145,9 +145,9 @@ const Home = () => {
     
     }
   
-    console.log(moduleId)
+    console.log(user)
     
- 
+    console.log(isAuthenticated)
   
 
   return (

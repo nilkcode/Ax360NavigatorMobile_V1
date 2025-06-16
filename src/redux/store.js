@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
 const persistConfig   = {
     key:'root',
     storage:AsyncStorage,
-    whitelist:['auth','navigation','siteselection','moduleId','exercises']   // only persist 'auth' slice
+    whitelist:['auth', 'navigation','siteselection','moduleId','exercises']   // only persist 'auth' slice
 }
 
 const persistedReducer  = persistReducer(persistConfig, rootReducer)

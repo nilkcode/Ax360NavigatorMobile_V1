@@ -72,6 +72,8 @@ const InputDateTimePicker = ({pickerType="calendar", isValidation=false, onDateC
       
         if(onDateChange) {
           //  onDateChange(dayjs(date).format('MMMM D, YYYY') ,)
+         // const selectedDate = dayjs("2025-06-12").startOf('day');
+
           onDateChange(dayjs(new Date(date)))
         }
         

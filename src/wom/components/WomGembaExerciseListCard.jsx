@@ -5,7 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext'
 import { themes } from '../../contexts/theme'
 import  Icon  from 'react-native-vector-icons/Entypo'
 
-const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,description,itemIsCompleted, handlePressDescription,handlePressMenu}) => {
+const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,description,itemIsCompleted, handlePressDescription,handlePressOpenExerciseDetail}) => {
 
  const {theme}  = useTheme()
 
@@ -17,7 +17,7 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
                      <Text className={`${themes[theme].textPrimary} text-base font-medium`}>{objectId}</Text>
                      <View className='flex-row gap-2 items-center '>
                         <Text className={`${themes[theme].textPrimary} text-base font-medium  `}>{formatedStudyDate}</Text>
-                       <TouchableOpacity onPress={handlePressMenu} className="pl-2"><Text><Icon name='dots-three-vertical' size={16}  /></Text></TouchableOpacity> 
+                       <TouchableOpacity onPress={handlePressOpenExerciseDetail} className="pl-2"><Text><Icon name='dots-three-vertical' size={16}  /></Text></TouchableOpacity> 
                      </View>
                      
                   </View>

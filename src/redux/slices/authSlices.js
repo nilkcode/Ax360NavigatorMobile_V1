@@ -22,25 +22,33 @@ export const loginUser = createAsyncThunk(
 
 const authSlice = createSlice({
     name:'auth',
-    initialState:{
-        isAuthenticated:false,
-        user:null,
-        loading:false,
-        error:null,
-    },
+  initialState: {
+    hasActiveDailogFlag: true,
+    isAuthenticated: false,
+    user: null,
+    loading: false,
+    error: null,
+
+  },
     reducers:{
         
-        updateStoreDataForUser:(state,action) => {
-             state.user = action.payload;
-             state.error = action.payload;
-             state.isAuthenticated = action.payload;
-        },
+      updateStoreDataForUser: (state, action) => {
+        state.user = action.payload;
+        state.error = action.payload;
+        state.isAuthenticated = action.payload;
+        
+      },
 
-        logout:(state) => {
-            state.user = null;
-            state.error = null
-            state.isAuthenticated = false;
-        },
+      logout: (state) => {
+        state.user = null;
+        state.error = null
+        state.isAuthenticated = false;
+        state.hasActiveDailogFlag = false;
+      },
+
+      setHasShownExerciseDialog: (state, action) => {
+        state.hasActiveDailogFlag = action.payload;
+      },
 
       
     },
@@ -50,20 +58,17 @@ const authSlice = createSlice({
             state.loading  = true;
             state.error = null;
         })
-        .addCase(loginUser.fulfilled,(state,action) => {
-            if(action.payload?.message){
+          .addCase(loginUser.fulfilled, (state, action) => {
+            if (action.payload?.message) {
               // If backend return error message
-               state.error = action.payload
-
-            }else {
-              state.user = action.payload    
-
-
+              state.error = action.payload
+            } else {
+              state.user = action.payload
             }
             state.isAuthenticated = true
             state.loading = false;
             // state.user = action.payload;
-        })
+          })
         .addCase(loginUser.rejected,(state,action) => {
             state.loading = false;
             state.error = action.payload; // 'Login failed'
@@ -73,5 +78,5 @@ const authSlice = createSlice({
     }
 })
 
-export const {logout ,updateStoreDataForUser} =  authSlice.actions;
+export const {logout ,updateStoreDataForUser,setHasShownExerciseDialog} =  authSlice.actions;
 export default authSlice.reducer;

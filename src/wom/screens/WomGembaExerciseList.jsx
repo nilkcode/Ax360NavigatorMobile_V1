@@ -16,7 +16,7 @@ import SearchInputBox from '../../components/InputsTextBox/SearchInputBox'
 import { useNavigation } from '@react-navigation/native'
 import { setLastScreen } from '../../redux/slices/navigationSlices'
 import { fetchExercises } from '../../redux/slices/exerciseSlice'
-
+import { setHasShownExerciseDialog } from '../../redux/slices/authSlices'
 
 
 const safetyList = [
@@ -32,34 +32,44 @@ const safetyList = [
 const WomGembaExerciseList = () => {
   const dispatch = useDispatch()
 
-  const { user } = useSelector((state) => state.auth)
+  const { user ,hasActiveDailogFlag,isAuthenticated} = useSelector((state) => state.auth)
   const [caseStudyListVisibleList, setCaseStudyListVisibleList] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [dataLoader, setDataLoader] = useState(false)
-  const [isShowWarningDailog, setWarningDailog] = useState(false)
+  // const [isShowWarningDailog, setWarningDailog] = useState(false)
   const [searchQuery , setSearchQuery] = useState('')
   const navigation  = useNavigation()
   const Limit = 10
- const { exerciseList,loading, error} = useSelector((state) => state.exercises);
- 
-
+  const { exerciseList,loading, error} = useSelector((state) => state.exercises);
+  
 
   useEffect(() => {
+
+    // if(!hasActiveDailogFlag) {
+    //    dispatch(setHasShownExerciseDialog(true))
+    // }
+     
     var idDto = {
       id: user?.companyId,
       id1: user?.siteId
     }
-
     dispatch(fetchExercises(idDto))
     getCaseStudyListBySId()
   }, [dispatch])
 
 
 
+  const handleCloseWarningDailog = () => {
+     if(hasActiveDailogFlag) {
+       dispatch(setHasShownExerciseDialog(false))
+     }
+  }
+
+
+
 
   const getCaseStudyListBySId = async () => {
       setCaseStudyListVisibleList(exerciseList.slice(0, Limit));
-      setWarningDailog(true)
       if (exerciseList.length <= Limit) setHasMore(false)
   };
 
@@ -103,8 +113,14 @@ const WomGembaExerciseList = () => {
     setCaseStudyListVisibleList(filterData)
   }
 
+  const handlePressOpenExerciseDetail = (item) => {
+     navigation.navigate('wom-mob-gemba-exercise-add-edit' , {
+       ItemId:item?.id || null,
+       IsmodeReadOnly: false, // indicate read-only mode
+     })
+  }
 
-console.log(exerciseList)
+  
 
   return (
     <>
@@ -119,15 +135,17 @@ console.log(exerciseList)
         <FlatList contentContainerStyle={{ paddingBottom: 70 }} data={caseStudyListVisibleList}
          keyExtractor={(item, index) => (item.id ? item.id.toString() : `index-${index}`)}
           renderItem={({ item }) => <WomGembaExerciseListCard  objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
+          handlePressOpenExerciseDetail={() => handlePressOpenExerciseDetail(item)}
             itemIsCompleted={item.isCompleted} />}
           onEndReached={loadMoreList}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooter}
+
         />
         {/* handlePressDescription={handlePressDescription} handlePressMenu={handlePressMenuList} */}
       </View>
       <Footer  />
-      <DailogModal show={isShowWarningDailog}  >
+      <DailogModal show={hasActiveDailogFlag}  >
         <View className="flex-row items-center mb-2">
           <Text className=""><Icon className="text-green-800" color={'#ca8a04'} name="warning" size={40} /></Text>
           <Text className="text-lg font-medium">Your safety is your personal responsibility.</Text>
@@ -143,7 +161,7 @@ console.log(exerciseList)
           ))
         }
         <View className="m-4">
-          <Button title={"I Agree"} variant='filled' size='large' onPress={() => setWarningDailog(false)} ></Button>
+          <Button title={"I Agree"} variant='filled' size='large' onPress={handleCloseWarningDailog} ></Button>
         </View>
 
       </DailogModal>

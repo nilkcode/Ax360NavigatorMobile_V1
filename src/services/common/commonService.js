@@ -28,6 +28,11 @@ const commonServices = {
     getCraftListBySId:async (obj) => {
          const response = await apiClient.post(`/api/cmn/getCraftListBySId`,obj)
        return response;
+    },
+
+     getCraftListByObjectId:async (obj) => {
+         const response = await apiClient.post(`/api/cmn/getCraftListByObjectId`,obj)
+       return response;
     }
 
 

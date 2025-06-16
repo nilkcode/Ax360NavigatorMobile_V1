@@ -29,9 +29,6 @@ const Main = ({}) => {
    const {lastScreen,lastActiveTime} = useSelector((state) => state.navigation)
    const [initialRoute, setInitialRoute ] =  useState(null)
 
-
-   console.log(lastScreen)
-   
  
   useEffect(() => {
     const now = Date.now();
@@ -46,7 +43,6 @@ const Main = ({}) => {
        setInitialRoute(lastScreen || 'login')
     }
 
-
     // fallback timeout to prevent stuck loader 
     const timeout =  setTimeout(() => {
        if(!initialRoute){
@@ -55,10 +51,6 @@ const Main = ({}) => {
     },3000)
 
      return () => clearTimeout(timeout)
-
-    
-   
-  
 
   }, [isAuthenticated, lastScreen, lastActiveTime])
 
