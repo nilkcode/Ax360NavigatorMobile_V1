@@ -14,7 +14,10 @@ const Footer = ({ activeRoute = "home" }) => {
   const navigatationHandler = (key) => {
     switch (key) {
       case 0:
-         dispatch(setLastScreen('wom-mob-gemba-exercise-add-edit')) 
+          dispatch(setLastScreen('wom-mob-gemba-exercise-add-edit')) 
+          navigate.navigate('wom-mob-gemba-exercise-add-edit', {
+            IsFormMode: true, // indicate read-only mode
+          })
           navigate.navigate('wom-mob-gemba-exercise-add-edit')
         break;
       case 1:

@@ -27,6 +27,7 @@ const WomGembaExerciseAddEdit = () => {
     const route = useRoute()
     const [error, setError] = useState({})
     const { user } = useSelector((state) => state.auth)
+    const { ItemId=null, IsFormMode, IsmodeReadOnly } = route.params || {};
     const { exerciseList, loading, success } = useSelector((state) => state.exercises);
     const [craftList, setCraftList] = useState([])
     const [selectedCraft, setSelectedCraft] = useState('')
@@ -34,11 +35,11 @@ const WomGembaExerciseAddEdit = () => {
     const craftRef = useRef();
     const navigation = useNavigation()
     const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+    const [isShowFormMode, setIsShowFormMode] = useState(false)
     const [submittedExercise, setSubmittedExercise] = useState([])
     const [submittedCraftList, setSubmittedCraftList] = useState([])
     const { moduleId } = useSelector((state) => state.moduleId)
-    const { ItemId, IsmodeReadOnly } = route.params || {};
-
+    const [exerciseId, setExerciseId] = useState('')
 
     const [formData, setFormData] = useState({
         id: 0,
@@ -53,6 +54,15 @@ const WomGembaExerciseAddEdit = () => {
     });
 
 
+    useEffect(() => {
+        if (ItemId !== null) {
+            getUserExerciseDetail(ItemId)
+        }else {
+             setIsFormSubmitted(false)
+             setIsShowFormMode(isFormSubmitted)
+        }
+
+    }, [ItemId])
 
 
     useEffect(() => {
@@ -60,13 +70,12 @@ const WomGembaExerciseAddEdit = () => {
         getLocationList()
 
         if (isFormSubmitted) {
-            debugger
+            
             var idDtoForList = {
                 id: user?.companyId,
                 id1: user?.siteId
             }
             dispatch(fetchExercises(idDtoForList))
-         
         }
     }, [isFormSubmitted])
 
@@ -74,24 +83,19 @@ const WomGembaExerciseAddEdit = () => {
     useEffect(() => {
         if (isFormSubmitted && exerciseList.length > 0) {
             // Now Redux has the latest list after fetchExercises
-            const latestExercise = exerciseList[0];
+            const latestExercise = exerciseList.filter((item) => item.id === Number(exerciseId));
             if (latestExercise) {
-                setSubmittedExercise(latestExercise); // ✅ patch latest data
-            
-                getCraftListByObjectId(latestExercise); // ✅ patch craft form
+                setSubmittedExercise(...latestExercise); // ✅ patch latest data
+                getCraftListByObjectId(...latestExercise); // ✅ patch craft form
             }
-           setIsFormSubmitted(true)
-        }
+           setIsFormSubmitted(false)
+           setIsShowFormMode(isFormSubmitted)
+        } 
     },[exerciseList])
 
+   
 
-
-    useEffect(() => {
-        if (!IsmodeReadOnly) {
-            getUserExerciseDetail(ItemId, IsmodeReadOnly)
-        }
-    }, [ItemId, IsmodeReadOnly])
-
+  console.log(exerciseList)
 
 
 
@@ -144,7 +148,7 @@ const WomGembaExerciseAddEdit = () => {
             id67: 'G',
             id24: latestExercise?.id,
             id: null, // objectNum
-            id25: 0           // 0 - jpo-original skills,1- jpo-optimized-skills
+            id25: 0   // 0 - jpo-original skills,1- jpo-optimized-skills
         };
 
 
@@ -158,9 +162,8 @@ const WomGembaExerciseAddEdit = () => {
 
     // This method for Submitting Exercise   
 
-    const handleSubmitExcercirseDetail = async () => {debugger
-
-        //validation of form first
+    const handleSubmitExcercirseDetail = async () => {
+        //validation of form 
         const isValidate = formValidate()
         if (!isValidate) {
             Toast.show({
@@ -169,7 +172,6 @@ const WomGembaExerciseAddEdit = () => {
             });
             return;
         }
-
         // Step 2 - Create idDto Object
         const idDto = {
             id1: formData?.objectId?.trim() || null,
@@ -195,30 +197,30 @@ const WomGembaExerciseAddEdit = () => {
             id61: new Date(formData?.studyDate),
             id62: null
         };
-
         // Step 3 - Call API
         try {
             const response = await dispatch(createExcercise(idDto)).unwrap(); // ✅
             if (response) {
 
-
                 if (formData?.id === 0) {
-                    Toast.show({
+                      Toast.show({
                         type: "success",
                         text1: `${success}`,
                     });
                     setIsFormSubmitted(true);
-
+                    setExerciseId(response)
+                  
                 } else {
-                    Toast.show({
+                   
+                    setIsFormSubmitted(true);
+                    setExerciseId(formData?.id)
+                     Toast.show({
                         type: "success",
                         text1: `Form Updated Successfully`,
                     });
                 }
 
             }
-
-
         } catch (error) {
             Alert.alert(`Error: ${error}`);
         }
@@ -240,6 +242,7 @@ const WomGembaExerciseAddEdit = () => {
 
 
     //Form Validation Method on Submit and Edit
+
     const formValidate = () => {
         const newError = {};
 
@@ -260,16 +263,17 @@ const WomGembaExerciseAddEdit = () => {
         return Object.keys(newError).length === 0
     }
 
-    const getUserExerciseDetail = (userId, IsmodeReadOnly) => {
-        setIsFormSubmitted(IsmodeReadOnly);
+    const getUserExerciseDetail = (userId) => {
+        setIsShowFormMode(true)
         const exerciseDetail = exerciseList.filter((item) => item.id === userId)
         setSubmittedExercise(...exerciseDetail);
+        
     }
 
     // This is method for handleEditExerciseDetail
 
     const handleEditExerciseDetail = () => {
-        setIsFormSubmitted(true)
+        setIsShowFormMode(false)
         setFormData({
             id: submittedExercise?.id || 0,
             studyDate: new Date(submittedExercise?.formatedStudyDate || ''),
@@ -283,7 +287,8 @@ const WomGembaExerciseAddEdit = () => {
         })
     }
 
-
+   
+    console.log(submittedExercise)
 
 
     return (
@@ -296,7 +301,87 @@ const WomGembaExerciseAddEdit = () => {
             </View>
             <KeyboardAvoidingView className="flex-1 flex-col flex-grow " behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-                {!isFormSubmitted ? (
+                {!isShowFormMode ?  (<ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 20 }}
+                        keyboardShouldPersistTaps="handled">
+                        <View className="mb-4">
+                            <View className="">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Exercise Date </Text>
+                            </View>
+                            <View>
+                                <InputDateTimePicker placeholder='' onDateChange={(date) => setFormData({ ...formData, studyDate: date })} />
+                            </View>
+
+                        </View>
+                        <View className="mb-4">
+                            <View className="">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>WorkOrder <Text className=" text-red-500">*</Text>
+                                </Text>
+
+                            </View>
+                            <View>
+                                <TextBox placeholder='Enter Work Order' isValidation={true} value={formData.objectId}
+                                    onChangeText={(text) => setFormData({ ...formData, objectId: text })} />
+                                {error.objectId && <Text className="text-red-500 relative left-4">{error.objectId}</Text>}
+                            </View>
+                        </View>
+                        <View className="mb-4">
+                            <View className="">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Description <Text className=" text-red-500">*</Text></Text>
+                            </View>
+                            <View>
+                                <TextBox placeholder='Enter Worder Description'
+                                    value={formData.description}
+                                    onChangeText={(text) => setFormData({ ...formData, description: text })} />
+                            </View>
+                            {error.description && <Text className="text-red-500 relative left-4">{error.description}</Text>}
+
+                        </View>
+                        <View className="flex-row gap-4">
+                            <View className="mb-4 w-[48%]">
+                                <View className="">
+                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Work Type <Text className=" text-red-500">*</Text></Text>
+                                </View>
+                                <View>
+                                    <DropDownBox placeholder='Work Type' data={workType} dropdownLabel='name' dropDownValue={workType.find(w => w.id === formData.workType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, workType: selected })} />
+                                </View>
+                                {error.workType && <Text className="text-red-500 relative left-4">{error.workType}</Text>}
+
+                            </View>
+                            <View className="mb-4 w-[48%]">
+                                <View className="">
+                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Study Type <Text className=" text-red-500">*</Text></Text>
+                                </View>
+                                <View>
+                                    <DropDownBox placeholder='Study Type' data={studyType} dropdownLabel='name' dropDownValue={studyType.find(s => s.id === formData.studyType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, studyType: selected })} />
+                                </View>
+                                {error.studyType && <Text className="text-red-500 relative left-4">{error.studyType}</Text>}
+
+                            </View>
+                        </View>
+                        <View className="mb-4">
+                            <View className="">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Eastimated Min</Text>
+                            </View>
+                            <View>
+                                <TextBox placeholder='Estimated Min' value={formData.expectedTime}
+                                    onChangeText={(text) => setFormData({ ...formData, expectedTime: text })} />
+                            </View>
+                        </View>
+                        <View className="mb-4">
+                            <View className="">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Area</Text>
+                            </View>
+                            <View>
+                                <DropDownBox placeholder='Area' data={locationList} dropdownLabel='name' dropDownValue={formData?.location} selectedValue={"name"} onSelect={(selected) => setFormData({ ...formData, location: selected })} />
+                            </View>
+                        </View>
+
+
+                        <WomGembaExcerciseFormArray craftList={craftList}
+                            onSelectCraft={handleSelectCraft} ref={craftRef} />
+
+                    </ScrollView>)  :
+                   (
                     <ScrollView className="p-4 divide-y " contentContainerStyle={{ paddingBottom: 20 }}
                         keyboardShouldPersistTaps="handled">
                         <View className="mb-4 " >
@@ -385,98 +470,19 @@ const WomGembaExerciseAddEdit = () => {
 
 
                     </ScrollView>
-                ) :
-                    (<ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 20 }}
-                        keyboardShouldPersistTaps="handled">
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Exercise Date </Text>
-                            </View>
-                            <View>
-                                <InputDateTimePicker placeholder='' onDateChange={(date) => setFormData({ ...formData, studyDate: date })} />
-                            </View>
+                )
 
-                        </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>WorkOrder <Text className=" text-red-500">*</Text>
-                                </Text>
-
-                            </View>
-                            <View>
-                                <TextBox placeholder='Enter Work Order' isValidation={true} value={formData.objectId}
-                                    onChangeText={(text) => setFormData({ ...formData, objectId: text })} />
-                                {error.objectId && <Text className="text-red-500 relative left-4">{error.objectId}</Text>}
-                            </View>
-                        </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Description <Text className=" text-red-500">*</Text></Text>
-                            </View>
-                            <View>
-                                <TextBox placeholder='Enter Worder Description'
-                                    value={formData.description}
-                                    onChangeText={(text) => setFormData({ ...formData, description: text })} />
-                            </View>
-                            {error.description && <Text className="text-red-500 relative left-4">{error.description}</Text>}
-
-                        </View>
-                        <View className="flex-row gap-4">
-                            <View className="mb-4 w-[48%]">
-                                <View className="">
-                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Work Type <Text className=" text-red-500">*</Text></Text>
-                                </View>
-                                <View>
-                                    <DropDownBox placeholder='Work Type' data={workType} dropdownLabel='name' dropDownValue={workType.find(w => w.id === formData.workType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, workType: selected })} />
-                                </View>
-                                {error.workType && <Text className="text-red-500 relative left-4">{error.workType}</Text>}
-
-                            </View>
-                            <View className="mb-4 w-[48%]">
-                                <View className="">
-                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Study Type <Text className=" text-red-500">*</Text></Text>
-                                </View>
-                                <View>
-                                    <DropDownBox placeholder='Study Type' data={studyType} dropdownLabel='name' dropDownValue={studyType.find(s => s.id === formData.studyType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, studyType: selected })} />
-                                </View>
-                                {error.studyType && <Text className="text-red-500 relative left-4">{error.studyType}</Text>}
-
-                            </View>
-                        </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Eastimated Min</Text>
-                            </View>
-                            <View>
-                                <TextBox placeholder='Estimated Min' value={formData.expectedTime}
-                                    onChangeText={(text) => setFormData({ ...formData, expectedTime: text })} />
-                            </View>
-                        </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Area</Text>
-                            </View>
-                            <View>
-                                <DropDownBox placeholder='Area' data={locationList} dropdownLabel='name' dropDownValue={formData?.location} selectedValue={"name"} onSelect={(selected) => setFormData({ ...formData, location: selected })} />
-                            </View>
-                        </View>
-
-
-                        <WomGembaExcerciseFormArray craftList={craftList}
-                            onSelectCraft={handleSelectCraft} ref={craftRef} />
-
-                    </ScrollView>)
                 }
-                {!isFormSubmitted ? (
-                    <View className="flex-row px-4 py-8">
-                        <Button title="Edit" size="medium" block="true" onPress={handleEditExerciseDetail} />
-                    </View>)
-                    : (
-                        <View className="flex-row px-4 py-8">
+                {!isShowFormMode ? (
+                     <View className="flex-row px-4 py-8">
                             <Button title="Save" size="medium" block="true" onPress={handleSubmitExcercirseDetail} />
-                        </View>)
+                        </View>
+                   )
+                    : (
+                       <View className="flex-row px-4 py-8">
+                        <Button title="Edit" size="medium" block="true" onPress={handleEditExerciseDetail} />
+                    </View> )
                 }
-
             </KeyboardAvoidingView>
 
             <Loader visible={loading} />

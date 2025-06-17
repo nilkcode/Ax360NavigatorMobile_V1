@@ -114,9 +114,9 @@ const WomGembaExerciseList = () => {
   }
 
   const handlePressOpenExerciseDetail = (item) => {
-     navigation.navigate('wom-mob-gemba-exercise-add-edit' , {
+     navigation.navigate('wom-mob-gemba-exercise-add-edit', {
        ItemId:item?.id || null,
-       IsmodeReadOnly: false, // indicate read-only mode
+       IsmodeReadOnly: false , // indicate read-only mode
      })
   }
 
