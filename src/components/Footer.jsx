@@ -5,7 +5,7 @@ import  Icon  from "react-native-vector-icons/Feather";
 import { useDispatch } from "react-redux";
 import { setLastScreen } from "../redux/slices/navigationSlices";
 
-const Footer = ({ activeRoute = "home" }) => {
+const Footer = ({ activeRoute = "home",  }) => {
   const navigate = useNavigation();
 
   const dispatch = useDispatch()

@@ -32,7 +32,7 @@ const WomGembaExerciseAddEdit = () => {
     const [craftList, setCraftList] = useState([])
     const [selectedCraft, setSelectedCraft] = useState('')
     const [locationList, setLocationList] = useState()
-    const craftRef = useRef();
+    const craftRef = useRef(null);
     const navigation = useNavigation()
     const [isFormSubmitted, setIsFormSubmitted] = useState(false);
     const [isShowFormMode, setIsShowFormMode] = useState(false)
@@ -40,6 +40,9 @@ const WomGembaExerciseAddEdit = () => {
     const [submittedCraftList, setSubmittedCraftList] = useState([])
     const { moduleId } = useSelector((state) => state.moduleId)
     const [exerciseId, setExerciseId] = useState('')
+
+    // this useState use for craftList edit 
+    const [shouldPatchCraft, setShouldPatchCraft] = useState(false); // flag for patching
 
     const [formData, setFormData] = useState({
         id: 0,
@@ -91,12 +94,17 @@ const WomGembaExerciseAddEdit = () => {
            setIsFormSubmitted(false)
            setIsShowFormMode(isFormSubmitted)
         } 
-    },[exerciseList])
+    },[exerciseList,submittedExercise])
 
    
 
-  console.log(exerciseList)
-
+    useEffect(() => {
+        if (shouldPatchCraft && craftRef.current) {
+            const craftString = submittedExercise?.craftString || ''; // e.g. "61-1~47-1~"
+            craftRef.current.patchCraftFormArray(craftString,);
+            setShouldPatchCraft(false); // reset flag
+        }
+    }, [shouldPatchCraft, submittedExercise]);
 
 
 
@@ -285,10 +293,14 @@ const WomGembaExerciseAddEdit = () => {
             area: submittedExercise?.location || '',
             location: submittedExercise?.location || '',
         })
+       
+        // Patch craft data string
+         setShouldPatchCraft(true); // trigger patch in effect
+
+        
     }
 
    
-    console.log(submittedExercise)
 
 
     return (
@@ -378,7 +390,8 @@ const WomGembaExerciseAddEdit = () => {
 
 
                         <WomGembaExcerciseFormArray craftList={craftList}
-                            onSelectCraft={handleSelectCraft} ref={craftRef} />
+                            onSelectCraft={handleSelectCraft} ref={craftRef} 
+                            />
 
                     </ScrollView>)  :
                    (

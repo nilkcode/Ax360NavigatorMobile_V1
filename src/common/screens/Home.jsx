@@ -145,10 +145,7 @@ const Home = () => {
     
     }
   
-    console.log(user)
-    
-    console.log(isAuthenticated)
-  
+
 
   return (
     <>
@@ -177,7 +174,7 @@ const Home = () => {
          dropDownValue={selecteSite?.siteIndustry} 
         handleChangeSite={handleChangeSite}   />
         <View className="mt-4">
-                 <Button title={"Select Site"} variant='filled' size='large'  onPress={onSelectedSiteSubmitEvent} />
+                 <Button title={"Select Site"} variant='filled' size='medium'  onPress={onSelectedSiteSubmitEvent} />
           </View>
       </DailogModal>
 

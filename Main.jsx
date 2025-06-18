@@ -82,9 +82,9 @@ const Main = ({}) => {
         </Stack.Navigator>
         <Toast position="top" />
       </NavigationContainer>
-      <View style={{ position: 'absolute', bottom: 4, right: 20 }}>
+      {/* <View style={{ position: 'absolute', bottom: 4, right: 20 }}>
         <Button variant="fab" size='fabMedium' icon={`${theme === 'light' ? 'sun' : 'moon'}`} iconSize={24} onPress={toggleTheme} />
-      </View>
+      </View> */}
       
     </>
   )

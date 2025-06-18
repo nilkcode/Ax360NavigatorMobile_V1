@@ -11,26 +11,46 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
 
   return (
     <>
-      <Cards className={"mb-2"}  isLeftBorderActive={true} borderColor={`${itemIsCompleted === 1 ? '#22c55e' :'#94a3b8' }`}>
-              <View className="flex-col gap-1 p-2 justify-between">
-                  <View className="flex-row  justify-between">
-                     <Text className={`${themes[theme].textPrimary} text-base font-medium`}>{objectId}</Text>
-                     <View className='flex-row gap-2 items-center '>
-                        <Text className={`${themes[theme].textPrimary} text-base font-medium  `}>{formatedStudyDate}</Text>
-                       <TouchableOpacity onPress={handlePressOpenExerciseDetail} className="pl-2"><Text><Icon name='dots-three-vertical' size={16}  /></Text></TouchableOpacity> 
-                     </View>
-                     
-                  </View>
-                    
-                  <View className="flex-row  justify-between">
-                      <Text className={`${themes[theme].textPrimary} text-lg font-medium`}>{studyTypeName}</Text>
-                     
-                  </View>
-                  <View >
-                     <TouchableOpacity onPress={handlePressDescription}> <Text className={`${themes[theme].textPrimary} text-base font-medium !text-blue-600`}>{description}</Text></TouchableOpacity>
-                  </View>
-              </View>
-      </Cards>
+     <Cards
+  className="mb-2"
+  isLeftBorderActive={true}
+  borderColor={itemIsCompleted === 1 ? '#22c55e' : '#94a3b8'}
+>
+  <View className="flex-col gap-1 p-2 justify-between">
+    <View className="flex-row justify-between">
+      <Text className={`${themes[theme].textPrimary} text-base font-medium`}>
+        {objectId}
+      </Text>
+
+      <View className="flex-row gap-2 items-center">
+        <Text className={`${themes[theme].textPrimary} text-base font-medium`}>
+          {formatedStudyDate }
+        </Text>
+
+        <TouchableOpacity onPress={handlePressOpenExerciseDetail} className="pl-2">
+          <Icon name="dots-three-vertical" size={16} />
+        </TouchableOpacity>
+      </View>
+    </View>
+
+    <View className="flex-row justify-between">
+      <Text className={`${themes[theme].textPrimary} text-lg font-medium`}>
+        {studyTypeName}
+      </Text>
+    </View>
+
+    <View>
+      <TouchableOpacity onPress={handlePressDescription}>
+        <Text
+          className={`${themes[theme].textPrimary} text-base font-medium !text-blue-600`}
+        >
+          {description}
+        </Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Cards>
+
     </>
   )
 }

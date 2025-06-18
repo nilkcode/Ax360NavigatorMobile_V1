@@ -34,7 +34,8 @@ const Header = ({ back = false, backScreen="" , leftActionTitle = "", rightActio
                 <View>
                   <Text className={`${themes[theme].formLabel} text-lg font-medium`}>{rightActionTitle}</Text>
                 </View>
-              </TouchableOpacity> :
+              </TouchableOpacity> 
+               :
                 <View className="flex flex-row " >
                   <Text className={`${themes[theme].formLabel} text-lg font-medium`}>{rightActionTitle}</Text>
                 </View>

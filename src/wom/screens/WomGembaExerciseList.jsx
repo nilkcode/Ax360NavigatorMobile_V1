@@ -31,120 +31,91 @@ const safetyList = [
 
 const WomGembaExerciseList = () => {
   const dispatch = useDispatch()
-
   const { user ,hasActiveDailogFlag,isAuthenticated} = useSelector((state) => state.auth)
   const [caseStudyListVisibleList, setCaseStudyListVisibleList] = useState([])
-  const [hasMore, setHasMore] = useState(true)
-  const [dataLoader, setDataLoader] = useState(false)
-  // const [isShowWarningDailog, setWarningDailog] = useState(false)
   const [searchQuery , setSearchQuery] = useState('')
   const navigation  = useNavigation()
-  const Limit = 10
+  const [filteredList, setFilteredList] = useState([]);
   const { exerciseList,loading, error} = useSelector((state) => state.exercises);
   
 
   useEffect(() => {
-
-    // if(!hasActiveDailogFlag) {
-    //    dispatch(setHasShownExerciseDialog(true))
-    // }
-     
-    var idDto = {
-      id: user?.companyId,
-      id1: user?.siteId
+    if (user?.companyId && user?.siteId) {
+      const idDto = {
+        id: user.companyId,
+        id1: user.siteId
+      };
+      dispatch(fetchExercises(idDto));
     }
-    dispatch(fetchExercises(idDto))
-    getCaseStudyListBySId()
-  }, [dispatch])
+  }, [dispatch, user]);
 
-
+  useEffect(() => {
+    if (exerciseList?.length) {
+      setFilteredList(exerciseList);
+    }
+  }, [exerciseList]);
 
   const handleCloseWarningDailog = () => {
-     if(hasActiveDailogFlag) {
-       dispatch(setHasShownExerciseDialog(false))
-     }
+    if (hasActiveDailogFlag) {
+      dispatch(setHasShownExerciseDialog(false))
+    }
   }
 
 
-
-
-  const getCaseStudyListBySId = async () => {
-      setCaseStudyListVisibleList(exerciseList.slice(0, Limit));
-      if (exerciseList.length <= Limit) setHasMore(false)
-  };
-
-  const loadMoreList = () => {
-    if (dataLoader || !hasMore) return;
-
-    setDataLoader(true)
-    setTimeout(() => {
-      const start = caseStudyListVisibleList.length;
-      const end = start + Limit;
-      const nextItems = exerciseList.slice(start, end);
-
-      if (nextItems.length === 0) {
-        setHasMore(false);
-        setDataLoader(false);
-        return;
-      }
-
-      setCaseStudyListVisibleList(prev => [...prev, ...nextItems]);
-
-      if (end >= exerciseList.length) {
-        setHasMore(false);
-      }
-      setDataLoader(false);
-    }, 500)
-  }
-
-  const renderFooter = () => (
-    loading ? (
-      <View className="flex justify-center">
-        <ActivityIndicator size="large" color="#007BFF" />
-      </View>
-    ) : null
-  );
-
- 
 
   const handleSearch = (text) => {
-    const filterData = exerciseList.filter((filterItem) => filterItem.objectId?.toString().includes(text)  || filterItem.description?.toLowerCase().includes(text.toLowerCase()))
-    setSearchQuery(text)   
-    setCaseStudyListVisibleList(filterData)
-  }
+    setSearchQuery(text);
+    if (!text.trim()) {
+      setFilteredList(exerciseList);
+      return;
+    }
+
+    const filtered = exerciseList.filter((item) =>
+      item.objectId?.toString().includes(text) ||
+      item.description?.toLowerCase().includes(text.toLowerCase())
+    );
+    setFilteredList(filtered);
+  };
 
   const handlePressOpenExerciseDetail = (item) => {
-     navigation.navigate('wom-mob-gemba-exercise-add-edit', {
-       ItemId:item?.id || null,
-       IsmodeReadOnly: false , // indicate read-only mode
-     })
+    navigation.navigate('wom-mob-gemba-exercise-add-edit', {
+      ItemId: item?.id || null,
+      IsmodeReadOnly: false, // indicate read-only mode
+    })
   }
 
-  
+
 
   return (
     <>
       <Header back={true} backScreen={'home'} leftActionTitle="Home" rightActionTitle="Home2" headerTitle="Exercises" />
- 
-       <SearchInputBox placeholder='Search Here..' onSearch={handleSearch}/>
 
-      {/* <View className="py-5">
-          <PillScrollFilter data={categories} labelName={'label'} color={'color'} handlePress={handleFilterExercise} />
-      </View> */}
+      <SearchInputBox placeholder='Search Here..' onSearch={handleSearch} />
       <View className="px-4 flex flex-1">
-        <FlatList contentContainerStyle={{ paddingBottom: 70 }} data={caseStudyListVisibleList}
-         keyExtractor={(item, index) => (item.id ? item.id.toString() : `index-${index}`)}
-          renderItem={({ item }) => <WomGembaExerciseListCard  objectId={item.objectId} studyTypeName={item.studyTypeName} formatedStudyDate={item.formatedStudyDate} description={item.description}
-          handlePressOpenExerciseDetail={() => handlePressOpenExerciseDetail(item)}
-            itemIsCompleted={item.isCompleted} />}
-          onEndReached={loadMoreList}
+        
+        <FlatList
+          contentContainerStyle={{ paddingBottom: 70 }}
+          data={filteredList}
+          keyExtractor={(item, index) =>
+            item.id ? item.id.toString() : `index-${index}`
+          }
+          renderItem={({ item }) => (
+            <WomGembaExerciseListCard
+              objectId={item.objectId}
+              studyTypeName={item.studyTypeName}
+              formatedStudyDate={item.formatedStudyDate}
+              description={item.description}
+              handlePressOpenExerciseDetail={() =>
+                handlePressOpenExerciseDetail(item)
+              }
+              itemIsCompleted={item.isCompleted}
+            />
+          )}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={renderFooter}
-
-        />
-        {/* handlePressDescription={handlePressDescription} handlePressMenu={handlePressMenuList} */}
+        
+        /> 
       </View>
-      <Footer  />
+      <Footer />
       <DailogModal show={hasActiveDailogFlag}  >
         <View className="flex-row items-center mb-2">
           <Text className=""><Icon className="text-green-800" color={'#ca8a04'} name="warning" size={40} /></Text>
@@ -153,7 +124,7 @@ const WomGembaExerciseList = () => {
         {
           safetyList.map((item, index) => (
             <View className="flex-row items-start  p-4 gap-1 " key={index}>
-             <Text><Octicons className="text-green-800 px-1 py-1" color={'black'} name="dot-fill" size={12} /></Text> 
+              <Text><Octicons className="text-green-800 px-1 py-1" color={'black'} name="dot-fill" size={12} /></Text>
               <Text className='flex-row gap-2 leading-5'>
                 {item.saftyDescription}
               </Text>

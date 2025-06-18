@@ -168,7 +168,7 @@ const Login = () => {
                   </TouchableOpacity>
               </View>
               <View className="mt-6">
-                  <Button variant='filled' size='large'  title={`${loading ? 'Login...' : 'Login'}`} onPress={handleFormSubmit} />
+                  <Button variant='filled' size='medium'  title={`${loading ? 'Login...' : 'Login'}`} onPress={handleFormSubmit} />
               </View>
               {error != null   && <Text className="text-white font-medium mt-2 p-3 flex justify-center text-center items-center rounded-full bg-red-500 " >{error}</Text>   }
               
