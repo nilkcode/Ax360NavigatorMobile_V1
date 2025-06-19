@@ -156,17 +156,17 @@ const Login = () => {
                           isValidation={true} />
                   </View>
               </View>
-              <View className='flex flex-row justify-between items-center '>
+              {/* <View className='flex-row justify-between bg-red-500 items-center w-full'>
                   <View className="flex flex-row items-center">
                       <Text className={`text-lg mx-4  ${themes[theme].formLabel}`}>Remember Me</Text>
                       <CheckBox label="Remember Me" checked={isChecked} onChange={() => setIsChecked(!isChecked)} />
                   </View>
-
-                  <TouchableOpacity className="mx-4">
-                      <Text style={{ fontFamily: "PoppinsItalic", }} className={`underline ${theme === "light" ? 'text-blue-600' : 'text-blue-500'} text-base font-medium`}>Forgot Password ?</Text>
-
-                  </TouchableOpacity>
-              </View>
+                <View>
+                    <TouchableOpacity className="mx-4">
+                        <Text style={{ fontFamily: "PoppinsItalic", }} className={`underline ${theme === "light" ? 'text-blue-600' : 'text-blue-500'} text-base font-medium`}>Forgot Password ?</Text>
+                    </TouchableOpacity>
+                </View>
+              </View> */}
               <View className="mt-6">
                   <Button variant='filled' size='medium'  title={`${loading ? 'Login...' : 'Login'}`} onPress={handleFormSubmit} />
               </View>

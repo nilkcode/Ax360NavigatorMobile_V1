@@ -41,6 +41,8 @@ const WomGembaExerciseAddEdit = () => {
     const { moduleId } = useSelector((state) => state.moduleId)
     const [exerciseId, setExerciseId] = useState('')
     const [isCraftListLoaded, setIsCraftListLoaded] = useState(false);
+    const [actionHeader, setActionHeader] = useState(false)
+    const [actionHeaderTitle, setActionHeaderTitle] = useState('')
 
     // this useState use for craftList edit 
     const [shouldPatchCraft, setShouldPatchCraft] = useState(false); // flag for patching
@@ -60,11 +62,25 @@ const WomGembaExerciseAddEdit = () => {
     // console.log(IsmodeReadOnly)
 
 
+    // useEffect(() => {
+    //     if (ItemId !== null) {
+    //         getUserExerciseDetail(ItemId);
+    //     } 
+    // }, [ItemId]);
+
     useEffect(() => {
-        if (ItemId !== null) {
+        if (ItemId !== null && isShowFormMode) {
+            // Viewing an existing exercise
+            setActionHeaderTitle('Submit');
             getUserExerciseDetail(ItemId);
-        } 
-    }, [ItemId]);
+        } else if (ItemId !== null && !isShowFormMode) {
+            // Editing existing exercise
+            setActionHeaderTitle('Delete');
+        } else {
+            // New exercise (form mode with no ID)
+            setActionHeaderTitle('');
+        }
+    }, [ItemId, isShowFormMode]);
 
 
     useEffect(() => {
@@ -72,7 +88,6 @@ const WomGembaExerciseAddEdit = () => {
         getLocationList()
 
         if (isFormSubmitted) {
-            
             var idDtoForList = {
                 id: user?.companyId,
                 id1: user?.siteId
@@ -94,6 +109,7 @@ const WomGembaExerciseAddEdit = () => {
                 getCraftListByObjectId(exercise); // ✅ patch craft form
             }
          setIsShowFormMode(true)
+         setActionHeader(true)
         } 
     },[exerciseList,exerciseId])
 
@@ -115,7 +131,9 @@ const WomGembaExerciseAddEdit = () => {
         }
     }, [isCraftListLoaded, submittedExercise]);
 
-//    console.log(isFormSubmitted)
+
+
+
 
     // This Existing craftList Code 
 
@@ -127,7 +145,6 @@ const WomGembaExerciseAddEdit = () => {
         const response = await commonServices.getCraftListBySId(idDto);
         setCraftList(response.data)
         setIsCraftListLoaded(true); // ✅ Mark as loaded
-
     };
 
 
@@ -335,9 +352,36 @@ const WomGembaExerciseAddEdit = () => {
         })
        
         // Patch craft data string
+        //  setActionHeader(true)
          setShouldPatchCraft(true); // trigger patch in effect
-
+         
         
+    }
+
+    // this header actions
+
+    const handlePressExerciseAction = (headerTitle) => {
+        switch (headerTitle) {
+            case 'Submit':
+                // logic for submitting
+                console.log('Submit logic executed');
+                break;
+            case 'Delete':
+                // logic for deleting
+                deleteExercise()
+                break;
+            case 'Lock':
+                // logic for editing
+                console.log('Edit logic executed');
+                break;
+            default:
+                console.warn('Unknown action:', headerTitle);
+        }
+    }
+
+    const deleteExercise = async () => {
+        
+        console.log('delete exercise')
     }
 
    
@@ -346,7 +390,7 @@ const WomGembaExerciseAddEdit = () => {
     return (
         <>
             <View>
-                <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Exercises" rightActionTitle="Launch" headerTitle="Exercises" />
+                <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Exercises" rightActionTitle={actionHeaderTitle} handlePressRight={() => handlePressExerciseAction(actionHeaderTitle)}   headerTitle="Exercises" />
             </View>
             <View className="bg-blue-200 p-4 my-3 mx-4 rounded-lg ">
                 <Text className="text-lg font-medium text-center">Observer : Nilesh Kahalkar</Text>

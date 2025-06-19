@@ -150,7 +150,7 @@ const Home = () => {
   return (
     <>
       <View style={screenLayout} >
-        <Header rightActionTitle={"Logout"} handlePressLeft={handleLogout} />
+        <Header rightActionTitle={"Logout"} handlePressRight={handleLogout} />
         <View className="flex flex-col text-center justify-center items-center mb-10">
           <Logo width={250} height={80} />
           <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Welcome, {user?.fullName}</Text>

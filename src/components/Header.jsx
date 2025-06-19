@@ -8,7 +8,7 @@ import { themes } from '../contexts/theme';
 import { screenLayout } from '../styles/style';
 import { useSelector } from 'react-redux';
 
-const Header = ({ back = false, backScreen="" , leftActionTitle = "", rightActionTitle = "", headerTitle = "", handlePressLeft }) => {
+const Header = ({ back = false, backScreen="" , leftActionTitle = "", rightActionTitle = "", headerTitle = "", handlePressRight }) => {
   const { theme } = useTheme()
   const navigate = useNavigation()
 
@@ -30,9 +30,9 @@ const Header = ({ back = false, backScreen="" , leftActionTitle = "", rightActio
           <View className={`w-auto justify-center flex flex-row items-center self-center`}><Text className={`${themes[theme].formLabel} text-xl font-medium`}>{headerTitle}</Text></View>
           <View className=" w-1/5 flex flex-row text-left justify-end pr-3 ">
             {
-              handlePressLeft ? <TouchableOpacity onPress={handlePressLeft}>
+              handlePressRight ? <TouchableOpacity onPress={handlePressRight}>
                 <View>
-                  <Text className={`${themes[theme].formLabel} text-lg font-medium`}>{rightActionTitle}</Text>
+                  <Text className={`${themes[theme].formLabel} text-lg font-medium ${rightActionTitle === 'Delete' && 'text-red-500'}`}>{rightActionTitle}</Text>
                 </View>
               </TouchableOpacity> 
                :
