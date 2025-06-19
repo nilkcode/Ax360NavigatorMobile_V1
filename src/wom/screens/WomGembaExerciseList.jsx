@@ -79,7 +79,13 @@ const WomGembaExerciseList = () => {
 
   const handlePressOpenExerciseDetail = (item) => {
     navigation.navigate('wom-mob-gemba-exercise-add-edit', {
-      ItemId: item?.id || null,
+      ItemId: item?.id,
+      IsmodeReadOnly: true, // indicate read-only mode
+    })
+  }
+
+  const onShowAddNewExercise = () => {
+     navigation.navigate('wom-mob-gemba-exercise-add-edit', {
       IsmodeReadOnly: false, // indicate read-only mode
     })
   }
@@ -92,7 +98,7 @@ const WomGembaExerciseList = () => {
 
       <SearchInputBox placeholder='Search Here..' onSearch={handleSearch} />
       <View className="px-4 flex flex-1">
-        
+        {/* <Text>{filteredList.length}</Text> */}
         <FlatList
           contentContainerStyle={{ paddingBottom: 70 }}
           data={filteredList}
@@ -115,7 +121,7 @@ const WomGembaExerciseList = () => {
         
         /> 
       </View>
-      <Footer />
+      <Footer handlePressCenter={onShowAddNewExercise}     />
       <DailogModal show={hasActiveDailogFlag}  >
         <View className="flex-row items-center mb-2">
           <Text className=""><Icon className="text-green-800" color={'#ca8a04'} name="warning" size={40} /></Text>

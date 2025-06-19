@@ -5,7 +5,7 @@ import  Icon  from "react-native-vector-icons/Feather";
 import { useDispatch } from "react-redux";
 import { setLastScreen } from "../redux/slices/navigationSlices";
 
-const Footer = ({ activeRoute = "home",  }) => {
+const Footer = ({ activeRoute = "home", handlePressCenter , handlePressLeft, handlePressRight}) => {
   const navigate = useNavigation();
 
   const dispatch = useDispatch()
@@ -38,7 +38,7 @@ const Footer = ({ activeRoute = "home",  }) => {
               <View className="flex-row items-center py-4" style={{justifyContent:'space-around'}}>
                   <TouchableOpacity
                       activeOpacity={0.8}
-                      onPress={() => navigatationHandler(1)}
+                      onPress={handlePressLeft}
                   >
                   <Text><Icon className="relative left-0" name="home" size={30} /></Text>
 
@@ -46,7 +46,7 @@ const Footer = ({ activeRoute = "home",  }) => {
 
                   <TouchableOpacity
                       activeOpacity={0.8}
-                      onPress={() => navigatationHandler(2)}>
+                      onPress={handlePressRight}>
                       <Text className=""><Icon className="relative left-0" name="search" size={30} /></Text>
 
                   </TouchableOpacity>
@@ -57,7 +57,7 @@ const Footer = ({ activeRoute = "home",  }) => {
                   <View className="flex justify-center items-center" >
                       <TouchableOpacity
                           activeOpacity={0.8}
-                          onPress={() => navigatationHandler(0)}>
+                          onPress={handlePressCenter}>
                           <Text className="text-white"><Icon className="relative left-0" name="plus" size={40} /></Text>
                       </TouchableOpacity>
                   </View>

@@ -27,7 +27,7 @@ const WomGembaExerciseAddEdit = () => {
     const route = useRoute()
     const [error, setError] = useState({})
     const { user } = useSelector((state) => state.auth)
-    const { ItemId=null, IsFormMode, IsmodeReadOnly } = route.params || {};
+    const { ItemId=null,  IsmodeReadOnly } = route.params || {};
     const { exerciseList, loading, success } = useSelector((state) => state.exercises);
     const [craftList, setCraftList] = useState([])
     const [selectedCraft, setSelectedCraft] = useState('')
@@ -35,11 +35,12 @@ const WomGembaExerciseAddEdit = () => {
     const craftRef = useRef(null);
     const navigation = useNavigation()
     const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-    const [isShowFormMode, setIsShowFormMode] = useState(false)
+    const [isShowFormMode, setIsShowFormMode] = useState(IsmodeReadOnly)
     const [submittedExercise, setSubmittedExercise] = useState([])
     const [submittedCraftList, setSubmittedCraftList] = useState([])
     const { moduleId } = useSelector((state) => state.moduleId)
     const [exerciseId, setExerciseId] = useState('')
+    const [isCraftListLoaded, setIsCraftListLoaded] = useState(false);
 
     // this useState use for craftList edit 
     const [shouldPatchCraft, setShouldPatchCraft] = useState(false); // flag for patching
@@ -56,16 +57,14 @@ const WomGembaExerciseAddEdit = () => {
         location: null,
     });
 
+    // console.log(IsmodeReadOnly)
+
 
     useEffect(() => {
         if (ItemId !== null) {
-            getUserExerciseDetail(ItemId)
-        }else {
-             setIsFormSubmitted(false)
-             setIsShowFormMode(isFormSubmitted)
-        }
-
-    }, [ItemId])
+            getUserExerciseDetail(ItemId);
+        } 
+    }, [ItemId]);
 
 
     useEffect(() => {
@@ -84,17 +83,19 @@ const WomGembaExerciseAddEdit = () => {
 
 
     useEffect(() => {
-        if (isFormSubmitted && exerciseList.length > 0) {
+        if (isFormSubmitted && exerciseList.length > 0 && exerciseId) {
             // Now Redux has the latest list after fetchExercises
             const latestExercise = exerciseList.filter((item) => item.id === Number(exerciseId));
+            const [exercise] = latestExercise;
+            
+            console.log(exercise)
             if (latestExercise) {
-                setSubmittedExercise(...latestExercise); // ✅ patch latest data
-                getCraftListByObjectId(...latestExercise); // ✅ patch craft form
+                setSubmittedExercise(exercise); // ✅ patch latest data
+                getCraftListByObjectId(exercise); // ✅ patch craft form
             }
-           setIsFormSubmitted(false)
-           setIsShowFormMode(isFormSubmitted)
+         setIsShowFormMode(true)
         } 
-    },[exerciseList,submittedExercise])
+    },[exerciseList,exerciseId])
 
    
 
@@ -104,9 +105,17 @@ const WomGembaExerciseAddEdit = () => {
             craftRef.current.patchCraftFormArray(craftString,);
             setShouldPatchCraft(false); // reset flag
         }
-    }, [shouldPatchCraft, submittedExercise]);
+    }, [shouldPatchCraft]);
 
 
+
+    useEffect(() => {
+        if (isCraftListLoaded && submittedExercise?.craftString) {
+            patchCraftList(submittedExercise.craftString);
+        }
+    }, [isCraftListLoaded, submittedExercise]);
+
+//    console.log(isFormSubmitted)
 
     // This Existing craftList Code 
 
@@ -117,12 +126,12 @@ const WomGembaExerciseAddEdit = () => {
         }
         const response = await commonServices.getCraftListBySId(idDto);
         setCraftList(response.data)
+        setIsCraftListLoaded(true); // ✅ Mark as loaded
 
     };
 
 
     // This is GET Location List  
-
     const getLocationList = () => {
         const locations = exerciseList.filter(
             (item, i, arr) => item.location && arr.findIndex(t => t.location === item.location) === i
@@ -136,7 +145,6 @@ const WomGembaExerciseAddEdit = () => {
         setLocationList(locationObj); // ✅ Set the full new list
     };
 
-
     // This is HandleSubmit Exercise List 
 
 
@@ -146,7 +154,6 @@ const WomGembaExerciseAddEdit = () => {
 
 
     // This is method for getCraftListByObjectId when form submited
-
     const getCraftListByObjectId = async (latestExercise) => {
         const idDto = {
             id21: +user?.companyId,
@@ -169,7 +176,6 @@ const WomGembaExerciseAddEdit = () => {
 
 
     // This method for Submitting Exercise   
-
     const handleSubmitExcercirseDetail = async () => {
         //validation of form 
         const isValidate = formValidate()
@@ -217,7 +223,7 @@ const WomGembaExerciseAddEdit = () => {
                     });
                     setIsFormSubmitted(true);
                     setExerciseId(response)
-                  
+                    
                 } else {
                    
                     setIsFormSubmitted(true);
@@ -274,9 +280,43 @@ const WomGembaExerciseAddEdit = () => {
     const getUserExerciseDetail = (userId) => {
         setIsShowFormMode(true)
         const exerciseDetail = exerciseList.filter((item) => item.id === userId)
+        patchCraftList(exerciseDetail[0].craftString)
         setSubmittedExercise(...exerciseDetail);
-        
     }
+
+
+    const patchCraftList = (craftString) => {
+      if (!craftString) return;
+
+      const normalize = craftString.replace(/~/g, ',').replace(/,+$/, '');
+
+      const parsedArray = normalize.split(',').map(item => {
+        const [idStr, qtyStr] = item.split('-');
+        const id = parseInt(idStr, 10);
+        const qty = parseInt(qtyStr, 10) || 1;
+
+        const matchedCraft = craftList.find(craft => Number(craft.id) === id);
+
+        if (matchedCraft) {
+          return {
+            ...matchedCraft,
+            id,
+            qty:String(qty),
+          };
+        }
+
+        // fallback for not found
+        return { id, qty: String(qty) };
+      });
+
+    //   // Add an empty row with numeric qty
+    //   parsedArray.push({ id: '', qty: 1 });
+
+      setSubmittedCraftList(parsedArray)
+     
+
+    }
+  
 
     // This is method for handleEditExerciseDetail
 
@@ -306,7 +346,7 @@ const WomGembaExerciseAddEdit = () => {
     return (
         <>
             <View>
-                <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Home" rightActionTitle="Launch" headerTitle="Exercises" />
+                <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Exercises" rightActionTitle="Launch" headerTitle="Exercises" />
             </View>
             <View className="bg-blue-200 p-4 my-3 mx-4 rounded-lg ">
                 <Text className="text-lg font-medium text-center">Observer : Nilesh Kahalkar</Text>
