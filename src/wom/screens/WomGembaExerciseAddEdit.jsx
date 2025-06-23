@@ -1,5 +1,6 @@
 import { View, Text, KeyboardAvoidingView, TouchableOpacity, Alert } from 'react-native'
 import React, { useEffect, useState, useRef } from 'react'
+import Modal from 'react-native-modal'
 import Header from '../../components/Header'
 import { ScrollView } from 'react-native-gesture-handler'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -7,7 +8,7 @@ import { themes } from '../../contexts/theme'
 import DropDownBox from '../../components/Dropdown/DropDownBox'
 import InputDateTimePicker from '../../components/DateTimePicker/InputDateTimePicker'
 import TextBox from '../../components/InputsTextBox/TextBox'
-import Icon from 'react-native-vector-icons/Entypo'
+import Icon from 'react-native-vector-icons/Feather'
 import Button from '../../components/Buttons/Button'
 import { workType, studyType } from '../../enums/globalenums'
 import WomGembaExcerciseFormArray from '../components/WomGembaExcerciseFormArray'
@@ -27,7 +28,7 @@ const WomGembaExerciseAddEdit = () => {
     const route = useRoute()
     const [error, setError] = useState({})
     const { user } = useSelector((state) => state.auth)
-    const { ItemId=null,  IsmodeReadOnly } = route.params || {};
+    const { ItemId = null, IsmodeReadOnly } = route.params || {};
     const { exerciseList, loading, success } = useSelector((state) => state.exercises);
     const [craftList, setCraftList] = useState([])
     const [selectedCraft, setSelectedCraft] = useState('')
@@ -43,6 +44,8 @@ const WomGembaExerciseAddEdit = () => {
     const [isCraftListLoaded, setIsCraftListLoaded] = useState(false);
     const [actionHeader, setActionHeader] = useState(false)
     const [actionHeaderTitle, setActionHeaderTitle] = useState('')
+    const [isModalVisible, setModalVisible] = useState(false);
+
 
     // this useState use for craftList edit 
     const [shouldPatchCraft, setShouldPatchCraft] = useState(false); // flag for patching
@@ -69,6 +72,10 @@ const WomGembaExerciseAddEdit = () => {
     // }, [ItemId]);
 
     useEffect(() => {
+        getCraftListBySId()
+        getLocationList()
+
+
         if (ItemId !== null && isShowFormMode) {
             // Viewing an existing exercise
             setActionHeaderTitle('Submit');
@@ -83,37 +90,37 @@ const WomGembaExerciseAddEdit = () => {
     }, [ItemId, isShowFormMode]);
 
 
-    useEffect(() => {
-        getCraftListBySId()
-        getLocationList()
+    // useEffect(() => {
+    //     getCraftListBySId()
+    //     getLocationList()
 
-        if (isFormSubmitted) {
-            var idDtoForList = {
-                id: user?.companyId,
-                id1: user?.siteId
-            }
-            dispatch(fetchExercises(idDtoForList))
-        }
-    }, [isFormSubmitted])
+    //     if (isFormSubmitted) {
+    //         var idDtoForList = {
+    //             id: user?.companyId,
+    //             id1: user?.siteId
+    //         }
+    //         dispatch(fetchExercises(idDtoForList))
+    //     }
+    // }, [isFormSubmitted])
 
 
-    useEffect(() => {
-        if (isFormSubmitted && exerciseList.length > 0 && exerciseId) {
-            // Now Redux has the latest list after fetchExercises
-            const latestExercise = exerciseList.filter((item) => item.id === Number(exerciseId));
-            const [exercise] = latestExercise;
-            
-            console.log(exercise)
-            if (latestExercise) {
-                setSubmittedExercise(exercise); // ✅ patch latest data
-                getCraftListByObjectId(exercise); // ✅ patch craft form
-            }
-         setIsShowFormMode(true)
-         setActionHeader(true)
-        } 
-    },[exerciseList,exerciseId])
+    // useEffect(() => {
+    //     if (isFormSubmitted && exerciseList.length > 0 && exerciseId) {
+    //         // Now Redux has the latest list after fetchExercises
+    //         const latestExercise = exerciseList.filter((item) => item.id === Number(exerciseId));
+    //         const [exercise] = latestExercise;
 
-   
+    //         console.log(exercise)
+    //         if (latestExercise) {
+    //             setSubmittedExercise(exercise); // ✅ patch latest data
+    //             getCraftListByObjectId(exercise); // ✅ patch craft form
+    //         }
+    //         setIsShowFormMode(true)
+    //         setActionHeader(true)
+    //     }
+    // }, [exerciseList, exerciseId])
+
+
 
     useEffect(() => {
         if (shouldPatchCraft && craftRef.current) {
@@ -229,45 +236,88 @@ const WomGembaExerciseAddEdit = () => {
             id62: null
         };
         // Step 3 - Call API
+        // try {
+        //     const response = await dispatch(createExcercise(idDto)).unwrap(); // ✅
+        //     if (response) {
+
+        //         if (formData?.id === 0) {
+        //             Toast.show({
+        //                 type: "success",
+        //                 text1: `${success}`,
+        //             });
+        //             setIsFormSubmitted(true);
+        //             setExerciseId(response)
+
+        //         } else {
+
+        //             setIsFormSubmitted(true);
+        //             setExerciseId(formData?.id)
+        //             Toast.show({
+        //                 type: "success",
+        //                 text1: `Form Updated Successfully`,
+        //             });
+        //         }
+
+        //     }
+        // } catch (error) {
+        //     Alert.alert(`Error: ${error}`);
+        // }
+        // setFormData({
+        //     id: '',
+        //     studyDate: new Date(),
+        //     objectId: '',
+        //     workType: '',
+        //     description: '',
+        //     studyType: '',
+        //     expectedTime: '',
+        //     area: '',
+        //     location: '',
+        // })
+        // craftRef.current?.clearCraftFormArray(); // ✅ clears the child component's form
+        //  navigation.push('/wom-mob-gemba-exercise-list')
         try {
-            const response = await dispatch(createExcercise(idDto)).unwrap(); // ✅
+            const response = await dispatch(createExcercise(idDto)).unwrap();
             if (response) {
+                const isNew = formData?.id === 0;
+                Toast.show({
+                    type: "success",
+                    text1: isNew ? success : "Form Updated Successfully",
+                });
 
-                if (formData?.id === 0) {
-                      Toast.show({
-                        type: "success",
-                        text1: `${success}`,
-                    });
-                    setIsFormSubmitted(true);
-                    setExerciseId(response)
-                    
-                } else {
-                   
-                    setIsFormSubmitted(true);
-                    setExerciseId(formData?.id)
-                     Toast.show({
-                        type: "success",
-                        text1: `Form Updated Successfully`,
-                    });
-                }
+                setExerciseId(isNew ? response : formData?.id);
 
+                const idDtoForList = {
+                    id: user?.companyId,
+                    id1: user?.siteId,
+                };
+
+                dispatch(fetchExercises(idDtoForList)).unwrap().then((newList) => {
+                    const latestExercise = newList.find(item => item.id === Number(isNew ? response : formData?.id));
+                    if (latestExercise) {
+                        setSubmittedExercise(latestExercise);
+                        getCraftListByObjectId(latestExercise);
+                        setIsShowFormMode(true);
+                        setActionHeader(true);
+                    }
+                });
+
+                setFormData({
+                    id: '',
+                    studyDate: new Date(),
+                    objectId: '',
+                    workType: '',
+                    description: '',
+                    studyType: '',
+                    expectedTime: '',
+                    area: '',
+                    location: '',
+                });
+                craftRef.current?.clearCraftFormArray();
             }
         } catch (error) {
             Alert.alert(`Error: ${error}`);
         }
-        setFormData({
-            id: '',
-            studyDate: new Date(),
-            objectId: '',
-            workType: '',
-            description: '',
-            studyType: '',
-            expectedTime: '',
-            area: '',
-            location: '',
-        })
-        craftRef.current?.clearCraftFormArray(); // ✅ clears the child component's form
-        //  navigation.push('/wom-mob-gemba-exercise-list')
+
     };
 
 
@@ -303,37 +353,37 @@ const WomGembaExerciseAddEdit = () => {
 
 
     const patchCraftList = (craftString) => {
-      if (!craftString) return;
+        if (!craftString) return;
 
-      const normalize = craftString.replace(/~/g, ',').replace(/,+$/, '');
+        const normalize = craftString.replace(/~/g, ',').replace(/,+$/, '');
 
-      const parsedArray = normalize.split(',').map(item => {
-        const [idStr, qtyStr] = item.split('-');
-        const id = parseInt(idStr, 10);
-        const qty = parseInt(qtyStr, 10) || 1;
+        const parsedArray = normalize.split(',').map(item => {
+            const [idStr, qtyStr] = item.split('-');
+            const id = parseInt(idStr, 10);
+            const qty = parseInt(qtyStr, 10) || 1;
 
-        const matchedCraft = craftList.find(craft => Number(craft.id) === id);
+            const matchedCraft = craftList.find(craft => Number(craft.id) === id);
 
-        if (matchedCraft) {
-          return {
-            ...matchedCraft,
-            id,
-            qty:String(qty),
-          };
-        }
+            if (matchedCraft) {
+                return {
+                    ...matchedCraft,
+                    id,
+                    qty: String(qty),
+                };
+            }
 
-        // fallback for not found
-        return { id, qty: String(qty) };
-      });
+            // fallback for not found
+            return { id, qty: String(qty) };
+        });
 
-    //   // Add an empty row with numeric qty
-    //   parsedArray.push({ id: '', qty: 1 });
+        //   // Add an empty row with numeric qty
+        //   parsedArray.push({ id: '', qty: 1 });
 
-      setSubmittedCraftList(parsedArray)
-     
+        setSubmittedCraftList(parsedArray)
+
 
     }
-  
+
 
     // This is method for handleEditExerciseDetail
 
@@ -350,12 +400,12 @@ const WomGembaExerciseAddEdit = () => {
             area: submittedExercise?.location || '',
             location: submittedExercise?.location || '',
         })
-       
+
         // Patch craft data string
         //  setActionHeader(true)
-         setShouldPatchCraft(true); // trigger patch in effect
-         
-        
+        setShouldPatchCraft(true); // trigger patch in effect
+
+
     }
 
     // this header actions
@@ -368,7 +418,8 @@ const WomGembaExerciseAddEdit = () => {
                 break;
             case 'Delete':
                 // logic for deleting
-                deleteExercise()
+               toggleModal()
+
                 break;
             case 'Lock':
                 // logic for editing
@@ -379,210 +430,233 @@ const WomGembaExerciseAddEdit = () => {
         }
     }
 
-    const deleteExercise = async () => {
-        
-        console.log('delete exercise')
+    // const deleteExercise =  () => {
+
+    //     console.log('delete exercise')
+    // }
+
+    const toggleModal =  (status) => {
+         setModalVisible(!isModalVisible);
+        if (status === 1) {
+            var idDto = {
+                id: user?.companyId,
+                id1: user?.siteId,
+            }
+             
+           
+            setModalVisible(!isModalVisible);
+        } else {
+            setModalVisible(!isModalVisible);
+        }
+
     }
 
-   
+    console.log(ItemId)
 
 
     return (
         <>
             <View>
-                <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Exercises" rightActionTitle={actionHeaderTitle} handlePressRight={() => handlePressExerciseAction(actionHeaderTitle)}   headerTitle="Exercises" />
+                <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Exercises" rightActionTitle={actionHeaderTitle} handlePressRight={() => handlePressExerciseAction(actionHeaderTitle)} headerTitle="Exercises" />
             </View>
             <View className="bg-blue-200 p-4 my-3 mx-4 rounded-lg ">
                 <Text className="text-lg font-medium text-center">Observer : Nilesh Kahalkar</Text>
             </View>
             <KeyboardAvoidingView className="flex-1 flex-col flex-grow " behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
-                {!isShowFormMode ?  (<ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 20 }}
-                        keyboardShouldPersistTaps="handled">
-                        <View className="mb-4">
+                {!isShowFormMode ? (<ScrollView className="p-4" contentContainerStyle={{ paddingBottom: 20 }}
+                    keyboardShouldPersistTaps="handled">
+                    <View className="mb-4">
+                        <View className="">
+                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Exercise Date </Text>
+                        </View>
+                        <View>
+                            <InputDateTimePicker placeholder='' onDateChange={(date) => setFormData({ ...formData, studyDate: date })} />
+                        </View>
+
+                    </View>
+                    <View className="mb-4">
+                        <View className="">
+                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>WorkOrder <Text className=" text-red-500">*</Text>
+                            </Text>
+
+                        </View>
+                        <View>
+                            <TextBox placeholder='Enter Work Order' isValidation={true} value={formData.objectId}
+                                onChangeText={(text) => setFormData({ ...formData, objectId: text })} />
+                            {error.objectId && <Text className="text-red-500 relative left-4">{error.objectId}</Text>}
+                        </View>
+                    </View>
+                    <View className="mb-4">
+                        <View className="">
+                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Description <Text className=" text-red-500">*</Text></Text>
+                        </View>
+                        <View>
+                            <TextBox placeholder='Enter Worder Description'
+                                value={formData.description}
+                                onChangeText={(text) => setFormData({ ...formData, description: text })} />
+                        </View>
+                        {error.description && <Text className="text-red-500 relative left-4">{error.description}</Text>}
+
+                    </View>
+                    <View className="flex-row gap-4">
+                        <View className="mb-4 w-[48%]">
                             <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Exercise Date </Text>
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Work Type <Text className=" text-red-500">*</Text></Text>
                             </View>
                             <View>
-                                <InputDateTimePicker placeholder='' onDateChange={(date) => setFormData({ ...formData, studyDate: date })} />
+                                <DropDownBox placeholder='Work Type' data={workType} dropdownLabel='name' dropDownValue={workType.find(w => w.id === formData.workType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, workType: selected })} />
                             </View>
+                            {error.workType && <Text className="text-red-500 relative left-4">{error.workType}</Text>}
 
                         </View>
-                        <View className="mb-4">
+                        <View className="mb-4 w-[48%]">
                             <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>WorkOrder <Text className=" text-red-500">*</Text>
-                                </Text>
-
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Study Type <Text className=" text-red-500">*</Text></Text>
                             </View>
                             <View>
-                                <TextBox placeholder='Enter Work Order' isValidation={true} value={formData.objectId}
-                                    onChangeText={(text) => setFormData({ ...formData, objectId: text })} />
-                                {error.objectId && <Text className="text-red-500 relative left-4">{error.objectId}</Text>}
+                                <DropDownBox placeholder='Study Type' data={studyType} dropdownLabel='name' dropDownValue={studyType.find(s => s.id === formData.studyType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, studyType: selected })} />
                             </View>
-                        </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Description <Text className=" text-red-500">*</Text></Text>
-                            </View>
-                            <View>
-                                <TextBox placeholder='Enter Worder Description'
-                                    value={formData.description}
-                                    onChangeText={(text) => setFormData({ ...formData, description: text })} />
-                            </View>
-                            {error.description && <Text className="text-red-500 relative left-4">{error.description}</Text>}
+                            {error.studyType && <Text className="text-red-500 relative left-4">{error.studyType}</Text>}
 
                         </View>
-                        <View className="flex-row gap-4">
-                            <View className="mb-4 w-[48%]">
-                                <View className="">
-                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Work Type <Text className=" text-red-500">*</Text></Text>
-                                </View>
-                                <View>
-                                    <DropDownBox placeholder='Work Type' data={workType} dropdownLabel='name' dropDownValue={workType.find(w => w.id === formData.workType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, workType: selected })} />
-                                </View>
-                                {error.workType && <Text className="text-red-500 relative left-4">{error.workType}</Text>}
-
-                            </View>
-                            <View className="mb-4 w-[48%]">
-                                <View className="">
-                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Study Type <Text className=" text-red-500">*</Text></Text>
-                                </View>
-                                <View>
-                                    <DropDownBox placeholder='Study Type' data={studyType} dropdownLabel='name' dropDownValue={studyType.find(s => s.id === formData.studyType)?.name} selectedValue={"id"} onSelect={(selected) => setFormData({ ...formData, studyType: selected })} />
-                                </View>
-                                {error.studyType && <Text className="text-red-500 relative left-4">{error.studyType}</Text>}
-
-                            </View>
+                    </View>
+                    <View className="mb-4">
+                        <View className="">
+                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Eastimated Min</Text>
                         </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Eastimated Min</Text>
-                            </View>
-                            <View>
-                                <TextBox placeholder='Estimated Min' value={formData.expectedTime}
-                                    onChangeText={(text) => setFormData({ ...formData, expectedTime: text })} />
-                            </View>
+                        <View>
+                            <TextBox placeholder='Estimated Min' value={formData.expectedTime}
+                                onChangeText={(text) => setFormData({ ...formData, expectedTime: text })} />
                         </View>
-                        <View className="mb-4">
-                            <View className="">
-                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Area</Text>
-                            </View>
-                            <View>
-                                <DropDownBox placeholder='Area' data={locationList} dropdownLabel='name' dropDownValue={formData?.location} selectedValue={"name"} onSelect={(selected) => setFormData({ ...formData, location: selected })} />
-                            </View>
+                    </View>
+                    <View className="mb-4">
+                        <View className="">
+                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Area</Text>
                         </View>
-
-
-                        <WomGembaExcerciseFormArray craftList={craftList}
-                            onSelectCraft={handleSelectCraft} ref={craftRef} 
-                            />
-
-                    </ScrollView>)  :
-                   (
-                    <ScrollView className="p-4 divide-y " contentContainerStyle={{ paddingBottom: 20 }}
-                        keyboardShouldPersistTaps="handled">
-                        <View className="mb-4 " >
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                Exercise Date
-                            </Text>
-                            <Text className="mx-4 text-base text-gray-800">
-                                {submittedExercise?.formatedStudyDate || '--'}
-                            </Text>
+                        <View>
+                            <DropDownBox placeholder='Area' data={locationList} dropdownLabel='name' dropDownValue={formData?.location} selectedValue={"name"} onSelect={(selected) => setFormData({ ...formData, location: selected })} />
                         </View>
+                    </View>
 
-                        <View className="mb-4">
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                Work Order
-                            </Text>
-                            <Text className="mx-4 text-base text-gray-800">
-                                {submittedExercise?.objectId || '--'}
-                            </Text>
-                        </View>
 
-                        <View className="mb-4">
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                Description
-                            </Text>
-                            <Text className="mx-4 text-base text-gray-800">
-                                {submittedExercise?.description || '--'}
-                            </Text>
-                        </View>
+                    <WomGembaExcerciseFormArray craftList={craftList}
+                        onSelectCraft={handleSelectCraft} ref={craftRef}
+                    />
 
-                        <View className="flex-row gap-4">
-                            <View className="mb-4 w-[48%]">
+                </ScrollView>) :
+                    (
+                        <ScrollView className="p-4 divide-y " contentContainerStyle={{ paddingBottom: 20 }}
+                            keyboardShouldPersistTaps="handled">
+                            <View className="mb-4 " >
                                 <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                    Work Type
+                                    Exercise Date
                                 </Text>
                                 <Text className="mx-4 text-base text-gray-800">
-                                    {submittedExercise?.workType || '--'}
+                                    {submittedExercise?.formatedStudyDate || '--'}
                                 </Text>
                             </View>
-                            <View className="mb-4 w-[48%]">
+
+                            <View className="mb-4">
                                 <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                    Study Type
+                                    Work Order
                                 </Text>
                                 <Text className="mx-4 text-base text-gray-800">
-                                    {submittedExercise?.studyType || '--'}
+                                    {submittedExercise?.objectId || '--'}
                                 </Text>
                             </View>
-                        </View>
 
-                        <View className="mb-4">
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                Estimated Min
-                            </Text>
-                            <Text className="mx-4 text-base text-gray-800">
-                                {submittedExercise?.expectedTime || '--'}
-                            </Text>
-                        </View>
+                            <View className="mb-4">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
+                                    Description
+                                </Text>
+                                <Text className="mx-4 text-base text-gray-800">
+                                    {submittedExercise?.description || '--'}
+                                </Text>
+                            </View>
 
-                        <View className="mb-4">
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
-                                Area
-                            </Text>
-                            <Text className="mx-4 text-base text-gray-800">
-                                {submittedExercise?.location || '--'}
-                            </Text>
-                        </View>
+                            <View className="flex-row gap-4">
+                                <View className="mb-4 w-[48%]">
+                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
+                                        Work Type
+                                    </Text>
+                                    <Text className="mx-4 text-base text-gray-800">
+                                        {submittedExercise?.workType || '--'}
+                                    </Text>
+                                </View>
+                                <View className="mb-4 w-[48%]">
+                                    <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
+                                        Study Type
+                                    </Text>
+                                    <Text className="mx-4 text-base text-gray-800">
+                                        {submittedExercise?.studyType || '--'}
+                                    </Text>
+                                </View>
+                            </View>
 
-                        <View className="mb-4 mx-4">
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-4 `}>Selected Craft Summary</Text>
+                            <View className="mb-4">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
+                                    Estimated Min
+                                </Text>
+                                <Text className="mx-4 text-base text-gray-800">
+                                    {submittedExercise?.expectedTime || '--'}
+                                </Text>
+                            </View>
 
-                            {submittedCraftList.length > 0 ? (
-                                submittedCraftList.map((craft, index) => (
-                                    <View key={index} className="border border-gray-300 p-2 rounded-xl mb-3 bg-white">
-                                        <Text className="text-base font-medium text-gray-800 mb-1">
-                                            {craft.name}
-                                        </Text>
+                            <View className="mb-4">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>
+                                    Area
+                                </Text>
+                                <Text className="mx-4 text-base text-gray-800">
+                                    {submittedExercise?.location || '--'}
+                                </Text>
+                            </View>
 
-                                        <Text className="text-sm text-gray-600">
-                                            <Text className="font-medium">Qty:</Text> {craft.qty}
-                                        </Text>
-                                    </View>
-                                ))
-                            ) : (
-                                <Text className="text-base text-gray-600">No craft selected.</Text>
-                            )}
-                        </View>
+                            <View className="mb-4 mx-4">
+                                <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-4 `}>Selected Craft Summary</Text>
+
+                                {submittedCraftList.length > 0 ? (
+                                    submittedCraftList.map((craft, index) => (
+                                        <View key={index} className="border border-gray-300 p-2 rounded-xl mb-3 bg-white">
+                                            <Text className="text-base font-medium text-gray-800 mb-1">
+                                                {craft.name}
+                                            </Text>
+
+                                            <Text className="text-sm text-gray-600">
+                                                <Text className="font-medium">Qty:</Text> {craft.qty}
+                                            </Text>
+                                        </View>
+                                    ))
+                                ) : (
+                                    <Text className="text-base text-gray-600">No craft selected.</Text>
+                                )}
+                            </View>
 
 
-                    </ScrollView>
-                )
+                        </ScrollView>
+                    )
 
                 }
                 {!isShowFormMode ? (
-                     <View className="flex-row px-4 py-8">
-                            <Button title="Save" size="medium" block="true" onPress={handleSubmitExcercirseDetail} />
-                        </View>
-                   )
+                    <View className="flex-row px-4 py-8">
+                        <Button title="Save" size="medium" block="true" onPress={handleSubmitExcercirseDetail} />
+                    </View>
+                )
                     : (
-                       <View className="flex-row px-4 py-8">
-                        <Button title="Edit" size="medium" block="true" onPress={handleEditExerciseDetail} />
-                    </View> )
+                        <View className="flex-row px-4 py-8">
+                            <Button title="Edit" size="medium" block="true" onPress={handleEditExerciseDetail} />
+                        </View>)
                 }
             </KeyboardAvoidingView>
 
+
+
+           
+
+
             <Loader visible={loading} />
+
+
 
         </>
     )
