@@ -1,6 +1,8 @@
 import { View, Text, Alert,Image ,ScrollView , } from 'react-native'
 import React, { use, useEffect ,useRef,useState} from 'react'
 import { screenLayout } from '../../styles/style'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
 import Header from '../../components/Header'
 import Cards from '../../components/Cards'
 import Logo  from "../../assets/images/360Nav_logo.svg"
@@ -9,7 +11,7 @@ import {useTheme} from "../../contexts/ThemeContext"
 import HomeCard from '../components/HomeCard'
 import { useDispatch, useSelector } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { logout, updateStoreDataForUser } from '../../redux/slices/authSlices'
+import { logout, setHasShownExerciseDialog, updateStoreDataForUser } from '../../redux/slices/authSlices'
 import { useNavigation } from '@react-navigation/native'
 import Button from '../../components/Buttons/Button'
 import DailogModal from '../../components/Modal/DailogModal'
@@ -40,7 +42,7 @@ const Home = () => {
     const [isOpenSiteDropDown, setIsOpenSiteDropDown] = useState(false)
     const [loading, setLoading] = useState(true)
      const {user,isAuthenticated} = useSelector((state) => state.auth)
-    const {moduleId} = useSelector((state) => state.moduleId)
+    // const {moduleId} = useSelector((state) => state.moduleId)
 
 
   const getModuleListBySId = async (SId) => {
@@ -56,13 +58,6 @@ const Home = () => {
   
   
   
-    const next = () => {
-      // implement interval logic
-    };
-
-
-   
-
    
   useEffect(() => {
       if (!user) return;
@@ -141,34 +136,37 @@ const Home = () => {
        dispatch(removeModuleId(item.moduleId));
        dispatch(setModuleId(item.moduleId))
        dispatch(setLastScreen(item.redirectURL))
-       navigation.navigate(item.redirectURL);
-    
+      
+       if(item.redirectURL === "/wom-mob-gemba-exercise-list") {
+               dispatch(setHasShownExerciseDialog(true))
+       }   
+        navigation.navigate(item.redirectURL);
+       
     }
   
 
 
   return (
     <>
-      <View style={screenLayout} >
-        <Header rightActionTitle={"Logout"} handlePressRight={handleLogout} />
-        <View className="flex flex-col text-center justify-center items-center mb-10">
-          <Logo width={250} height={80} />
-          <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Welcome, {user?.fullName}</Text>
-          <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Selected Site- {selecteSite?.siteName}</Text>
+    
+          <Header rightActionTitle={"Logout"} handlePressRight={handleLogout} />
+          <View className="flex flex-col text-center justify-center items-center mb-10">
+            <Logo width={250} height={80} />
+            <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Welcome, {user?.fullName}</Text>
+            <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Selected Site- {selecteSite?.siteName}</Text>
 
-        </View>
-        <ScrollView >
-          <View className="flex flex-1 flex-col gap-4">
-
-            {moduleList.length > 0 ? ( moduleList.map((module, index) => (
-              <HomeCard key={index} moduleName={module.mobileModuleName} moduleDetails={module.description} imagePath={module.mobileBackGroundImagePath} 
-              handlePress={() => handlePressEvent(module)}/>
-            )) ) : (<Text className="text-center"> No module List found </Text>)}
           </View>
-        </ScrollView>
-       
-      </View>
-      <Loader visible={loading}/>
+          <ScrollView >
+            <View className="flex flex-1 flex-col gap-2 px-4">
+
+              {moduleList.length > 0 ? (moduleList.map((module, index) => (
+                <HomeCard key={index} moduleName={module.mobileModuleName} moduleDetails={module.description} imagePath={module.mobileBackGroundImagePath}
+                  handlePress={() => handlePressEvent(module)} />
+              ))) : (<Text className="text-center"> No module List found </Text>)}
+            </View>
+          </ScrollView>
+      
+     
       <DailogModal title="Select Site"  show={isOpenSiteDropDown} onClose={handleCloseSiteDropDown}>
         <SiteSelection siteList={siteListData}  selectedValue={'id'} 
          dropDownValue={selecteSite?.siteIndustry} 
@@ -177,6 +175,9 @@ const Home = () => {
                  <Button title={"Select Site"} variant='filled' size='medium'  onPress={onSelectedSiteSubmitEvent} />
           </View>
       </DailogModal>
+
+
+       <Loader visible={loading}/>
 
     </>
     // selectedSiteID={}

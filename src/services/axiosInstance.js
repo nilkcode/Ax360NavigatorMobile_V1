@@ -4,6 +4,9 @@ import { Alert } from "react-native";
 import { encryptPayloadsUsingAES256, decryptAPIResponseUsingAES256 } from "../utlis/cryptoHelper";
 import {store} from "../redux/store"
 import { logout } from "../redux/slices/authSlices";
+import {navigate} from "../services/authServices/NavigationService"
+
+
 const apiClient = axios.create({
     baseURL: BASE_URL,
 
@@ -64,6 +67,7 @@ apiClient.interceptors.request.use(
                 text:"OK",
                 onPress: () => {
                   store.dispatch(logout())
+                  navigate('login')
                 }
               }
             ]);

@@ -17,6 +17,7 @@ import Loader from './src/components/Loaders/Loader';
 import { useSelector } from 'react-redux';
 import WomGembaExerciseList from './src/wom/screens/WomGembaExerciseList';
 import WomGembaExerciseAddEdit from './src/wom/screens/WomGembaExerciseAddEdit';
+import { navigationRef } from './src/services/authServices/NavigationService';
 
 const Stack = createNativeStackNavigator()
 
@@ -66,14 +67,14 @@ const Main = ({}) => {
 
   return (
     <>
-      <NavigationContainer theme={theme === 'light' ? DefaultTheme : DarkTheme}>
+      <NavigationContainer theme={theme === 'light' ? DefaultTheme : DarkTheme} ref={navigationRef}>
         <Stack.Navigator initialRouteName={initialRoute}
           screenOptions={{ headerShown: false, }}>
           <Stack.Group>
             <Stack.Screen name='login' component={Login} screenOptions={{ headerShown: false, }} />
             <Stack.Screen name='home' component={Home} screenOptions={{ headerShown: false }} />
             <Stack.Screen name='/wom-mob-gemba-exercise-list' component={WomGembaExerciseList}
-             options={{ headerShown: false ,title:'Exercise'}}
+           
               />
                <Stack.Screen name='wom-mob-gemba-exercise-add-edit' component={WomGembaExerciseAddEdit}
              options={{ headerShown: false ,title:'Exercise'}}

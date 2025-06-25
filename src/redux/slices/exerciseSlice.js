@@ -28,6 +28,16 @@ export const createExcercise = createAsyncThunk('exercise/createExcercise', asyn
 })
 
 
+export const deleteExercise = createAsyncThunk('exercise/deleteExercise', async(idDto, { rejectWithValue }) => {
+  try {
+     await womServices.deleteCaseStudyById(idDto);
+     return idDto.id21; // return the deleted ID
+  } catch (error) {
+    return rejectWithValue(error.response?.data)
+  }
+})
+
+
 
 const exerciseSlice = createSlice({
     name:'exercises',
@@ -68,7 +78,28 @@ const exerciseSlice = createSlice({
           .addCase(createExcercise.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
+          })
+
+          
+          // deleteExercise
+
+          // delete
+          .addCase(deleteExercise.pending, (state) => {
+            state.loading = true;
+          })
+          .addCase(deleteExercise.fulfilled, (state, action) => {
+            state.loading = false;
+            state.success = "Exercise deleted successfully!";
+            state.exerciseList = state.exerciseList.filter(
+              (item) => item.id !== action.payload
+            );
+          })
+          .addCase(deleteExercise.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload;
           });
+
+
     }
 })
 

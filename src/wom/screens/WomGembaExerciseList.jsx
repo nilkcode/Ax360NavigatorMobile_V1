@@ -1,7 +1,6 @@
-import { View, Text, FlatList, ActivityIndicator, Alert } from 'react-native'
+import { View, Text, FlatList, ActivityIndicator, Alert, TouchableOpacity, StyleSheet } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import Header from '../../components/Header'
-import { screenLayout } from '../../styles/style'
 import { useSelector, useDispatch } from 'react-redux'
 import womServices from '../../services/wom/womService'
 import WomGembaExerciseListCard from '../components/WomGembaExerciseListCard'
@@ -92,53 +91,83 @@ const WomGembaExerciseList = () => {
 
 
 
+
+
   return (
     <>
-      <Header back={true} backScreen={'home'} leftActionTitle="Home" rightActionTitle="Home2" headerTitle="Exercises" />
-
-      <SearchInputBox placeholder='Search Here..' onSearch={handleSearch} />
-      <View className="px-4 flex flex-1">
-        {/* <Text>{filteredList.length}</Text> */}
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 70 }}
-          data={filteredList}
-          keyExtractor={(item, index) =>
-            item.id ? item.id.toString() : `index-${index}`
-          }
-          renderItem={({ item }) => (
-            <WomGembaExerciseListCard
-              objectId={item.objectId}
-              studyTypeName={item.studyTypeName}
-              formatedStudyDate={item.formatedStudyDate}
-              description={item.description}
-              handlePressOpenExerciseDetail={() =>
-                handlePressOpenExerciseDetail(item)
-              }
-              itemIsCompleted={item.isCompleted}
-            />
-          )}
-          onEndReachedThreshold={0.5}
+      <View className="flex-1 ">
         
-        /> 
+        <Header back={true} backScreen={'home'} leftActionTitle="Home" headerTitle="Exercises" />
+       
+        <View className="flex-2 mx-4" >
+
+          <SearchInputBox placeholder='Search Here..' onSearch={handleSearch}  />
+          
+            {/* <Text>{filteredList.length}</Text> */}
+            <FlatList
+              contentContainerStyle={{ paddingBottom:240}}
+              data={filteredList}
+              keyExtractor={(item, index) =>
+                item.id ? item.id.toString() : `index-${index}`
+              }
+              renderItem={({ item }) => (
+                <WomGembaExerciseListCard
+                  objectId={item.objectId}
+                  studyTypeName={item.studyTypeName}
+                  formatedStudyDate={item.formatedStudyDate}
+                  description={item.description}
+                  handlePressOpenExerciseDetail={() =>
+                    handlePressOpenExerciseDetail(item)
+                  }
+                  itemIsCompleted={item.isCompleted}
+                />
+              )}
+              onEndReachedThreshold={0.5}
+
+            />
+            
+     
+
+
+
+        </View>
+        <TouchableOpacity
+          style={styles.floatingButton}
+          activeOpacity={0.9}
+          onPress={() => onShowAddNewExercise()}
+        >
+          <View className="flex-row items-center">
+                <Text className="text-white">
+            <Icon name="add" size={24} />
+          </Text>
+          <Text style={styles.buttonText}>Add Exercise</Text>
+          </View>
+      
+        </TouchableOpacity>
       </View>
-      <Footer handlePressCenter={onShowAddNewExercise}     />
+      {/* <Footer handlePressCenter={onShowAddNewExercise} /> */}
       <DailogModal show={hasActiveDailogFlag}  >
-        <View className="flex-row items-center mb-2">
+        <View className="flex-row items-center  justify-center mb-2 gap-3">
           <Text className=""><Icon className="text-green-800" color={'#ca8a04'} name="warning" size={40} /></Text>
-          <Text className="text-lg font-medium">Your safety is your personal responsibility.</Text>
+         <View >
+          <Text className="text-lg font-medium" numberOfLines={3} >Your safety is your </Text>
+          <Text className="text-lg font-medium">personal responsibility
+            </Text>
+         </View>
+          
         </View>
         {
           safetyList.map((item, index) => (
-            <View className="flex-row items-start  p-4 gap-1 " key={index}>
+            <View className="flex-row  p-4 gap-2 " key={index}>
               <Text><Octicons className="text-green-800 px-1 py-1" color={'black'} name="dot-fill" size={12} /></Text>
-              <Text className='flex-row gap-2 leading-5'>
+              <Text className='flex-row gap-2 leading-5' >
                 {item.saftyDescription}
               </Text>
             </View>
           ))
         }
         <View className="m-4">
-          <Button title={"I Agree"} variant='filled' size='large' onPress={handleCloseWarningDailog} ></Button>
+          <Button title={"I Agree"} variant='filled' size='medium' onPress={handleCloseWarningDailog} ></Button>
         </View>
 
       </DailogModal>
@@ -148,3 +177,39 @@ const WomGembaExerciseList = () => {
 }
 
 export default WomGembaExerciseList
+
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  listItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d1d5db', // Tailwind's gray-300
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 28, // Tailwind's bottom-6
+    left: '50%',
+    transform: [{ translateX: -100 }], // Half of button width to center it
+    backgroundColor: '#3b82f6', // Blue-500
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 9999, // Fully rounded
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+    width: 200, // Required for centering transform
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

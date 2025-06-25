@@ -39,11 +39,12 @@ const SearchInputBox = ({ placeholder = 'Search...', onSearch, delay = 300, styl
         className="text-lg text-nau"
         placeholder={placeholder}
         onChangeText={handleChange}
-        style={[inputStyle]}
+        style={{width:'90%'}}
         autoCapitalize="none"
         autoCorrect={false}
         clearButtonMode="while-editing"
         value={searchText}
+        
       /> 
       <View className="flex-row items-center">
       {searchText.length > 0 ? (

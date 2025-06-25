@@ -15,7 +15,9 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
   className="mb-2"
   isLeftBorderActive={true}
   borderColor={itemIsCompleted === 1 ? '#22c55e' : '#94a3b8'}
->
+  onPress={handlePressOpenExerciseDetail}
+> 
+<TouchableOpacity  onPress={handlePressOpenExerciseDetail} >
   <View className="flex-col gap-1 p-2 justify-between">
     <View className="flex-row justify-between">
       <Text className={`${themes[theme].textPrimary} text-base font-medium`}>
@@ -27,9 +29,9 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
           {formatedStudyDate }
         </Text>
 
-        <TouchableOpacity onPress={handlePressOpenExerciseDetail} className="pl-2">
+        {/* <TouchableOpacity onPress={handlePressOpenExerciseDetail} className="pl-2">
           <Icon name="dots-three-vertical" size={16} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
 
@@ -49,6 +51,7 @@ const WomGembaExerciseListCard = ({objectId, studyTypeName,formatedStudyDate,des
       </TouchableOpacity>
     </View>
   </View>
+  </TouchableOpacity>
 </Cards>
 
     </>

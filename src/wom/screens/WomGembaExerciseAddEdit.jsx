@@ -1,5 +1,5 @@
 import { View, Text, KeyboardAvoidingView, TouchableOpacity, Alert } from 'react-native'
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef ,useMemo} from 'react'
 import Modal from 'react-native-modal'
 import Header from '../../components/Header'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -8,18 +8,19 @@ import { themes } from '../../contexts/theme'
 import DropDownBox from '../../components/Dropdown/DropDownBox'
 import InputDateTimePicker from '../../components/DateTimePicker/InputDateTimePicker'
 import TextBox from '../../components/InputsTextBox/TextBox'
-import Icon from 'react-native-vector-icons/Feather'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 import Button from '../../components/Buttons/Button'
 import { workType, studyType } from '../../enums/globalenums'
 import WomGembaExcerciseFormArray from '../components/WomGembaExcerciseFormArray'
 import { useSelector, useDispatch } from 'react-redux'
 import commonServices from '../../services/common/commonService'
-import { createExcercise, fetchExercises } from '../../redux/slices/exerciseSlice'
+import { createExcercise, deleteExercise, fetchExercises } from '../../redux/slices/exerciseSlice'
 import womServices from '../../services/wom/womService'
 import Toast from 'react-native-toast-message';
 import Loader from '../../components/Loaders/Loader'
 import { useNavigation, useRoute } from '@react-navigation/native'
-
+import DailogModal from '../../components/Modal/DailogModal'
+import SwalModal from '../../components/Modal/SwalModal'
 
 
 const WomGembaExerciseAddEdit = () => {
@@ -45,6 +46,7 @@ const WomGembaExerciseAddEdit = () => {
     const [actionHeader, setActionHeader] = useState(false)
     const [actionHeaderTitle, setActionHeaderTitle] = useState('')
     const [isModalVisible, setModalVisible] = useState(false);
+    const [deleting, setIsDeleting] = useState(false)
 
 
     // this useState use for craftList edit 
@@ -62,14 +64,7 @@ const WomGembaExerciseAddEdit = () => {
         location: null,
     });
 
-    // console.log(IsmodeReadOnly)
 
-
-    // useEffect(() => {
-    //     if (ItemId !== null) {
-    //         getUserExerciseDetail(ItemId);
-    //     } 
-    // }, [ItemId]);
 
     useEffect(() => {
         getCraftListBySId()
@@ -90,35 +85,6 @@ const WomGembaExerciseAddEdit = () => {
     }, [ItemId, isShowFormMode]);
 
 
-    // useEffect(() => {
-    //     getCraftListBySId()
-    //     getLocationList()
-
-    //     if (isFormSubmitted) {
-    //         var idDtoForList = {
-    //             id: user?.companyId,
-    //             id1: user?.siteId
-    //         }
-    //         dispatch(fetchExercises(idDtoForList))
-    //     }
-    // }, [isFormSubmitted])
-
-
-    // useEffect(() => {
-    //     if (isFormSubmitted && exerciseList.length > 0 && exerciseId) {
-    //         // Now Redux has the latest list after fetchExercises
-    //         const latestExercise = exerciseList.filter((item) => item.id === Number(exerciseId));
-    //         const [exercise] = latestExercise;
-
-    //         console.log(exercise)
-    //         if (latestExercise) {
-    //             setSubmittedExercise(exercise); // ✅ patch latest data
-    //             getCraftListByObjectId(exercise); // ✅ patch craft form
-    //         }
-    //         setIsShowFormMode(true)
-    //         setActionHeader(true)
-    //     }
-    // }, [exerciseList, exerciseId])
 
 
 
@@ -174,6 +140,14 @@ const WomGembaExerciseAddEdit = () => {
 
     const handleSelectCraft = (selectedCraftValue) => {
         setSelectedCraft(selectedCraftValue)
+        // ✅ Clear craft error if at least one valid craft selected
+        if (selectedCraftValue && selectedCraftValue.includes('-')) {
+            setError(prev => {
+                const updatedError = { ...prev };
+                delete updatedError.selectedCraftValue;
+                return updatedError;
+            });
+        }
     }
 
 
@@ -235,46 +209,7 @@ const WomGembaExerciseAddEdit = () => {
             id61: new Date(formData?.studyDate),
             id62: null
         };
-        // Step 3 - Call API
-        // try {
-        //     const response = await dispatch(createExcercise(idDto)).unwrap(); // ✅
-        //     if (response) {
 
-        //         if (formData?.id === 0) {
-        //             Toast.show({
-        //                 type: "success",
-        //                 text1: `${success}`,
-        //             });
-        //             setIsFormSubmitted(true);
-        //             setExerciseId(response)
-
-        //         } else {
-
-        //             setIsFormSubmitted(true);
-        //             setExerciseId(formData?.id)
-        //             Toast.show({
-        //                 type: "success",
-        //                 text1: `Form Updated Successfully`,
-        //             });
-        //         }
-
-        //     }
-        // } catch (error) {
-        //     Alert.alert(`Error: ${error}`);
-        // }
-        // setFormData({
-        //     id: '',
-        //     studyDate: new Date(),
-        //     objectId: '',
-        //     workType: '',
-        //     description: '',
-        //     studyType: '',
-        //     expectedTime: '',
-        //     area: '',
-        //     location: '',
-        // })
-        // craftRef.current?.clearCraftFormArray(); // ✅ clears the child component's form
-        //  navigation.push('/wom-mob-gemba-exercise-list')
         try {
             const response = await dispatch(createExcercise(idDto)).unwrap();
             if (response) {
@@ -339,6 +274,11 @@ const WomGembaExerciseAddEdit = () => {
         if (!formData.studyType) {
             newError.studyType = `StudyType  is required`
         }
+        // Validate selectedCraft string (format: "id-qty~id-qty~")
+        if (!selectedCraft || !selectedCraft.trim() || !selectedCraft.includes('-')) {
+            newError.selectedCraft = `At least one valid craft and selecte qty is required`;
+        }
+        
         setError(newError)
         // Return true if there are no error
         return Object.keys(newError).length === 0
@@ -418,7 +358,7 @@ const WomGembaExerciseAddEdit = () => {
                 break;
             case 'Delete':
                 // logic for deleting
-               toggleModal()
+                setModalVisible(true);
 
                 break;
             case 'Lock':
@@ -435,23 +375,46 @@ const WomGembaExerciseAddEdit = () => {
     //     console.log('delete exercise')
     // }
 
-    const toggleModal =  (status) => {
-         setModalVisible(!isModalVisible);
-        if (status === 1) {
-            var idDto = {
-                id: user?.companyId,
-                id1: user?.siteId,
-            }
-             
-           
-            setModalVisible(!isModalVisible);
-        } else {
-            setModalVisible(!isModalVisible);
+
+
+
+    const handleDeleteExercise = async () => {
+        setModalVisible(false); // Close modal only on success
+        try {
+            const idDto = { id21: formData?.id };
+
+            await dispatch(deleteExercise(idDto)).unwrap();
+
+            Toast.show({
+                type: "success",
+                text1: "Exercise Deleted successfully",
+            });
+
+            navigation.navigate('/wom-mob-gemba-exercise-list');
+            
+        } catch (error) {
+            Toast.show({
+                type: "error",
+                text1: 'Failed to delete exercise',
+                text2: error?.message || 'Unknown error',
+            });
+        } finally {
+             setModalVisible(false);
         }
+    };
 
-    }
+    const workTypeName = useMemo(() => {
+        return workType.find(wt => wt.id === submittedExercise?.workType)?.name || '--';
+    }, [submittedExercise?.workType]);
 
-    console.log(ItemId)
+
+       const studyTypeName = useMemo(() => {
+        return studyType.find(wt => wt.id === submittedExercise?.studyType)?.name || '--';
+    }, [submittedExercise?.studyType]);
+
+
+
+
 
 
     return (
@@ -523,7 +486,7 @@ const WomGembaExerciseAddEdit = () => {
                     </View>
                     <View className="mb-4">
                         <View className="">
-                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Eastimated Min</Text>
+                            <Text className={`text-lg font-medium ${themes[theme].formLabel} mb-2 mx-4`}>Estimated  Min</Text>
                         </View>
                         <View>
                             <TextBox placeholder='Estimated Min' value={formData.expectedTime}
@@ -542,7 +505,9 @@ const WomGembaExerciseAddEdit = () => {
 
                     <WomGembaExcerciseFormArray craftList={craftList}
                         onSelectCraft={handleSelectCraft} ref={craftRef}
+                        error={error}
                     />
+
 
                 </ScrollView>) :
                     (
@@ -581,7 +546,9 @@ const WomGembaExerciseAddEdit = () => {
                                         Work Type
                                     </Text>
                                     <Text className="mx-4 text-base text-gray-800">
-                                        {submittedExercise?.workType || '--'}
+                                        <Text>{workTypeName}</Text>
+
+                                        {/* {workType.find(submittedExercise?.workType || '--').name} */}
                                     </Text>
                                 </View>
                                 <View className="mb-4 w-[48%]">
@@ -589,7 +556,9 @@ const WomGembaExerciseAddEdit = () => {
                                         Study Type
                                     </Text>
                                     <Text className="mx-4 text-base text-gray-800">
-                                        {submittedExercise?.studyType || '--'}
+                                        {/* {studyType.find(submittedExercise?.studyType || '--').name} */}
+                                        {/* {submittedExercise?.studyType || '--'} */}
+                                       <Text>{studyTypeName}</Text> 
                                     </Text>
                                 </View>
                             </View>
@@ -649,14 +618,30 @@ const WomGembaExerciseAddEdit = () => {
                 }
             </KeyboardAvoidingView>
 
+        
 
 
-           
+            {isModalVisible && <SwalModal titleCan='Cancel' titleConf='Yes' title={"Are you sure want to delete exercise"}
+                show={isModalVisible}
+                onCancel={() => setModalVisible(false)}
+                onConfirm={handleDeleteExercise}>
+                <Text className="text-red-500 text-center mb-2">
+                    <Ionicons name='trash-outline' size={36} />
+                </Text>
+                <Text className="text-xl font-semibold text-center ">
+                    Are you sure you want to delete this exercise?
+                </Text>
+            </SwalModal>
+            }
+
+
+
+
 
 
             <Loader visible={loading} />
 
-
+             <Loader visible={deleting}/>
 
         </>
     )

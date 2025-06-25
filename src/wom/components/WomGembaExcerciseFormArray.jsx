@@ -7,7 +7,7 @@ import TextBox from '../../components/InputsTextBox/TextBox'
 import Icon from 'react-native-vector-icons/Entypo'
 import { ScrollView } from 'react-native-gesture-handler'
 
-const WomGembaExcerciseFormArray = forwardRef(({ craftList, onSelectCraft  }, ref) => {
+const WomGembaExcerciseFormArray = forwardRef(({ craftList, onSelectCraft,error  }, ref) => {
   const { theme } = useTheme()
 
   const [craftFormArray, setCraftFormArray] = useState([{ id: '', qty: '1' }]  || [])
@@ -92,6 +92,9 @@ const WomGembaExcerciseFormArray = forwardRef(({ craftList, onSelectCraft  }, re
     const updatedCraft = craftFormArray.filter((_, i) => i !== index)
     setCraftFormArray(updatedCraft)
 
+      // 🔁 Update selectedCraft after removal
+  onSelectCraft(generateCraftQtyString(updatedCraft));
+
   }
 
   const generateCraftQtyString = (array) => {
@@ -145,10 +148,10 @@ const WomGembaExcerciseFormArray = forwardRef(({ craftList, onSelectCraft  }, re
           </View>
 
           {/* Quantity + Remove Button */}
-          <View className="mb-4 w-[45%]">
+          <View className="mb-4 w-[43%]">
            
             <View className="flex-row items-center justify-between gap-1">
-              <View className={`${craftFormArray.length !== 1 ? 'w-[80%]' : 'w-full'}`}>
+              <View className={`${craftFormArray.length !== 1 ? 'w-[65%]' : 'w-full'}`}>
                 <TextBox
                   isValidation={false}
                   inputType="number"
@@ -160,7 +163,7 @@ const WomGembaExcerciseFormArray = forwardRef(({ craftList, onSelectCraft  }, re
               </View>
               {
                 craftFormArray.length !== 1 &&  index !== craftFormArray.length - 1 && <TouchableOpacity
-                  className="bg-red-200 rounded-full p-2 ml-2"
+                  className="bg-red-200 rounded-full p-3 "
                   onPress={() => handleRemoveCraftForm(index)}
                 >
                   <Icon name="cross" size={20} color="red" />
@@ -171,6 +174,9 @@ const WomGembaExcerciseFormArray = forwardRef(({ craftList, onSelectCraft  }, re
           </View>
         </View>
       ))}
+      {error?.selectedCraft ? craftFormArray.length > 1 ? ('') : <Text className="text-red-500 text-sm mt-1 mx-4">{error.selectedCraft}</Text>  : (
+        <Text className="text-red-500 text-sm mt-1 mx-4">{error.selectedCraft}</Text>
+      )} 
     </ScrollView>
   )
 })
