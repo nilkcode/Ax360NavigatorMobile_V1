@@ -1,5 +1,5 @@
-import { View, Text, Alert,Image ,ScrollView , } from 'react-native'
-import React, { use, useEffect ,useRef,useState} from 'react'
+import { View, Text,FlatList} from 'react-native'
+import React, { use, useCallback, useEffect ,useRef,useState} from 'react'
 import { screenLayout } from '../../styles/style'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
@@ -39,13 +39,24 @@ const Home = () => {
     const [moduleList, setModuleList] = useState([])
     const [siteListData, setSiteListData] = useState([])
     const [selecteSite, setSelectedSite] = useState(null)
+    const [hasInitialSiteSelectionDone, setHasInitialSiteSelectionDone] = useState(false);
+
     const [isOpenSiteDropDown, setIsOpenSiteDropDown] = useState(false)
     const [loading, setLoading] = useState(true)
-     const {user,isAuthenticated} = useSelector((state) => state.auth)
-    // const {moduleId} = useSelector((state) => state.moduleId)
+    const {user,isAuthenticated} = useSelector((state) => state.auth)
+    const [userName, setUserName] = useState('User Name')
 
 
-  const getModuleListBySId = async (SId) => {
+  useEffect(() => {
+    if(user){
+      setUserName(`${user.firstName.toUpperCase()}`)
+    }
+  },[user])  
+
+
+
+  // Memoized Function
+  const getModuleListBySId = useCallback(async (SId) => {
     var idDto = {
       id21: +user.companyId,
       id22: +SId,
@@ -54,85 +65,89 @@ const Home = () => {
     const response = await commonServices.getModuleListByUserAndSid(idDto);
     setModuleList(response.data)
     
-  };
-  
-  
-  
-   
-  useEffect(() => {
-      if (!user) return;
-      if (user.isCompanyAccess === true) {
-        //  dispatch(fetchCompanyList());
-        return 
-      } else {
+  },[user]);
+
+
+  const fetchSiteListData = useCallback(async () => {
+    setLoading(true);
+     const idDto = {
+      id: +user.roleId === role.companyAdmin ? user.companyId : user.userId,
+    };
+
+   const response = +user.roleId === role.companyAdmin
+      ? await commonServices.getSiteListByCompanyId(idDto)
+      : await commonServices.getSiteListByUserRoleId(idDto);
     
-         if(selecteSite) {
-          dispatch(setIsOpenSiteDropdownlistComponent(false));
-          getModuleListBySId(user?.siteId);
-         }else {
-          const idDto = {
-            id: +user.roleId === role.companyAdmin ? user.companyId : user.userId
-          };
-          const fetchSiteList = async () => {
-            setLoading(true)
-            const response =
-              +user.roleId === role.companyAdmin
-                ? await commonServices.getSiteListByCompanyId(idDto)
-                : await commonServices.getSiteListByUserRoleId(idDto);
-              
-              setSiteListData(response.data)
-              setLoading(false)
-            if(siteListData.length > 1) {
-              setSelectedSite(siteListData[0])
-              setIsOpenSiteDropDown(true)
-             
-            }else {
-               setSelectedSite(siteListData[0]);
-               onSelectedSiteSubmitEvent()
-            }
-  
-          }
-          fetchSiteList()
-          
-         }
-      }
-
-       
-         if (siteListData.length === 1) {
-            onSelectedSiteSubmitEvent()
-         }
-  
+  setSiteListData(response.data);
+  setLoading(false);
 
 
+    if (response.data.length > 1 && !hasInitialSiteSelectionDone) {
+      setSelectedSite(response.data[0]);
+      setIsOpenSiteDropDown(true);
+      setHasInitialSiteSelectionDone(true);
+
+    } else {
+      setSelectedSite(response.data[0]);
+
+      // skip modal
+      // ✅ Now manually fetch here since modal is not shown
+      getModuleListBySId(response.data[0].id);
+      setIsOpenSiteDropDown(false);
+      setHasInitialSiteSelectionDone(true);
+    }
+  },[user, hasInitialSiteSelectionDone])
+
+  // Fetch site list once user is available
+  useEffect(() => {
+    if (!user || user.isCompanyAccess) return;
+    fetchSiteListData();
+  }, [user]);
+
+
+
+  // Handle auto-site selection when siteListData length is 1
+  useEffect(() => {
+    if (siteListData.length === 1) {
+      setSelectedSite(siteListData[0]);
+    }
   }, [siteListData]);
 
 
-  
- 
 
-    const handleLogout = () => {
+  
+  
+  
+  
+
+
+
+    const handleLogout = useCallback(() => {
         dispatch(logout())
         dispatch(resetSiteSelectionState())
         navigation.navigate('login')
-    }
+    },[dispatch, navigation])
 
 
-    const handleChangeSite = (value) => {
+    const handleChangeSite = useCallback((value) => {
        let selectedSite =  siteListData.find((item) => item.id === value)
        setSelectedSite(selectedSite)
-    };
+    },[siteListData]);
 
 
-    const onSelectedSiteSubmitEvent = () => {
-         getModuleListBySId(selecteSite?.id)
+    const onSelectedSiteSubmitEvent = useCallback(() => {
+      if(selecteSite?.id) {
+             getModuleListBySId(selecteSite?.id)
          handleCloseSiteDropDown()
-
-    }
+      }
+    },[selecteSite,getModuleListBySId])
 
     const handleCloseSiteDropDown = () => {
        setIsOpenSiteDropDown(false)
     }
-    const handlePressEvent = (item) => {
+
+
+    const handlePressEvent = useCallback((item) => {
        dispatch(removeModuleId(item.moduleId));
        dispatch(setModuleId(item.moduleId))
        dispatch(setLastScreen(item.redirectURL))
@@ -142,32 +157,41 @@ const Home = () => {
        }   
         navigation.navigate(item.redirectURL);
        
-    }
-  
+    },[dispatch, navigation])
 
+ 
 
   return (
     <>
-    
-          <Header rightActionTitle={"Logout"} handlePressRight={handleLogout} />
+      <View className="flex-1">
+        <View>
+          <Header  leftActionTitle={"Logout"} leftIconName="chevron-left" isLeftIcon={true}  handlePressLeft={handleLogout} rightActionTitle={userName} handlePressRight={false} isRightIcon={true} rightIconName="user" />
+
+        </View>
+        <View className="flex-2">
           <View className="flex flex-col text-center justify-center items-center mb-10">
             <Logo width={250} height={80} />
             <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Welcome, {user?.fullName}</Text>
             <Text className={`${themes[theme].textPrimary} text-2xl font-medium`}>Selected Site- {selecteSite?.siteName}</Text>
-
           </View>
-          <ScrollView >
-            <View className="flex flex-1 flex-col gap-2 px-4">
-
-              {moduleList.length > 0 ? (moduleList.map((module, index) => (
-                <HomeCard key={index} moduleName={module.mobileModuleName} moduleDetails={module.description} imagePath={module.mobileBackGroundImagePath}
-                  handlePress={() => handlePressEvent(module)} />
-              ))) : (<Text className="text-center"> No module List found </Text>)}
-            </View>
-          </ScrollView>
-      
-     
-      <DailogModal title="Select Site"  show={isOpenSiteDropDown} onClose={handleCloseSiteDropDown}>
+          <FlatList
+            data={moduleList}
+            keyExtractor={(item, index) => index.toString()}
+            contentContainerStyle={{ paddingBottom: 80, paddingHorizontal: 16 }}
+            renderItem={({ item }) => (
+              <HomeCard
+                moduleName={item.mobileModuleName}
+                moduleDetails={item.description}
+                imagePath={item.mobileBackGroundImagePath}
+                handlePress={() => handlePressEvent(item)}
+              />
+            )}
+            ListEmptyComponent={<Text className="text-center">No module list found</Text>}
+          />
+        </View>
+        </View>
+         
+      <DailogModal title="Select Site"  show={isOpenSiteDropDown} onClose={() => setIsOpenSiteDropDown(false)}>
         <SiteSelection siteList={siteListData}  selectedValue={'id'} 
          dropDownValue={selecteSite?.siteIndustry} 
         handleChangeSite={handleChangeSite}   />
@@ -180,7 +204,6 @@ const Home = () => {
        <Loader visible={loading}/>
 
     </>
-    // selectedSiteID={}
 )
 }
 

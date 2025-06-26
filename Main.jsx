@@ -73,9 +73,7 @@ const Main = ({}) => {
           <Stack.Group>
             <Stack.Screen name='login' component={Login} screenOptions={{ headerShown: false, }} />
             <Stack.Screen name='home' component={Home} screenOptions={{ headerShown: false }} />
-            <Stack.Screen name='/wom-mob-gemba-exercise-list' component={WomGembaExerciseList}
-           
-              />
+            <Stack.Screen name='/wom-mob-gemba-exercise-list' component={WomGembaExerciseList}   options={{ headerShown: false ,title:'Exercise'}}/>
                <Stack.Screen name='wom-mob-gemba-exercise-add-edit' component={WomGembaExerciseAddEdit}
              options={{ headerShown: false ,title:'Exercise'}}
               />

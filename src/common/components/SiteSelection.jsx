@@ -1,9 +1,7 @@
 import { View, Text } from 'react-native'
-import React, { useEffect, useReducer, useState } from 'react'
+import React from 'react'
 import DropDownBox from '../../components/Dropdown/DropDownBox'
-import { useSelector,useDispatch } from 'react-redux'
-import { role } from '../../enums/globalenums'
-import { fetchSiteList ,setSelectedUserSite,} from '../../redux/slices/siteSelectionSlice'
+
 
 const SiteSelection = ({siteList, selectedValue,dropDownValue ,handleChangeSite}) => {
 

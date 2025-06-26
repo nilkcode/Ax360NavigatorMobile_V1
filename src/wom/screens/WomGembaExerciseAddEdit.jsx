@@ -354,7 +354,7 @@ const WomGembaExerciseAddEdit = () => {
         switch (headerTitle) {
             case 'Submit':
                 // logic for submitting
-                console.log('Submit logic executed');
+                // console.log('Submit logic executed');
                 break;
             case 'Delete':
                 // logic for deleting
@@ -363,10 +363,10 @@ const WomGembaExerciseAddEdit = () => {
                 break;
             case 'Lock':
                 // logic for editing
-                console.log('Edit logic executed');
+                // console.log('Edit logic executed');
                 break;
             default:
-                console.warn('Unknown action:', headerTitle);
+                // console.warn('Unknown action:', headerTitle);
         }
     }
 
@@ -423,7 +423,7 @@ const WomGembaExerciseAddEdit = () => {
                 <Header back={true} backScreen={'/wom-mob-gemba-exercise-list'} leftActionTitle="Exercises" rightActionTitle={actionHeaderTitle} handlePressRight={() => handlePressExerciseAction(actionHeaderTitle)} headerTitle="Exercises" />
             </View>
             <View className="bg-blue-200 p-4 my-3 mx-4 rounded-lg ">
-                <Text className="text-lg font-medium text-center">Observer : Nilesh Kahalkar</Text>
+                <Text className="text-lg font-medium text-center">Observer : {user.fullName}</Text>
             </View>
             <KeyboardAvoidingView className="flex-1 flex-col flex-grow " behavior={Platform.OS === 'ios' ? 'padding' : undefined}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}>
@@ -607,12 +607,12 @@ const WomGembaExerciseAddEdit = () => {
 
                 }
                 {!isShowFormMode ? (
-                    <View className="flex-row px-4 py-8">
+                    <View className="flex-row px-4 py-3">
                         <Button title="Save" size="medium" block="true" onPress={handleSubmitExcercirseDetail} />
                     </View>
                 )
                     : (
-                        <View className="flex-row px-4 py-8">
+                        <View className="flex-row px-4 py-3">
                             <Button title="Edit" size="medium" block="true" onPress={handleEditExerciseDetail} />
                         </View>)
                 }

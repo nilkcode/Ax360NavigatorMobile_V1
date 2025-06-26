@@ -33,7 +33,7 @@ const SearchInputBox = ({ placeholder = 'Search...', onSearch, delay = 300, styl
 
 
   return (
-    <View className="pl-2 pr-5 m-4 flex-row justify-between items-center  bg-[#f0f0f0] py-1 rounded-full  border-neutral-800">
+    <View className="pl-2 pr-5 m-2 flex-row justify-between items-center  bg-[#f0f0f0]  rounded-full  border-neutral-800">
       <TextInput
         ref={inputRef}
         className="text-lg text-nau"

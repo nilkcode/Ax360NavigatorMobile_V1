@@ -1,5 +1,5 @@
 import { View, Text,Image } from 'react-native'
-import React from 'react'
+import React,{memo} from 'react'
 import Cards from '../../components/Cards'
 
 import {themes} from '../../contexts/theme';
@@ -28,7 +28,7 @@ const HomeCard = ({moduleName,imagePath,moduleDetails ,handlePress}) => {
   return (
     <>
     {/* !bg-transparent !shadow-none !border-0 */}
-         <Cards className='p-2' handlePress={handlePress}>
+         <Cards className='p-2 mb-2' handlePress={handlePress}>
           <View className="flex flex-row gap-4 items-center justify-between">
             <View >
               <Text   className={`${themes[theme].textPrimary} text-xl font-semibold`}>{moduleName}</Text>

@@ -96,37 +96,37 @@ const WomGembaExerciseList = () => {
   return (
     <>
       <View className="flex-1 ">
-        
-        <Header back={true} backScreen={'home'} leftActionTitle="Home" headerTitle="Exercises" />
-       
+        <View >
+          <Header back={true} backScreen={'home'} leftActionTitle="Home" headerTitle="Exercises" />
+        </View>
         <View className="flex-2 mx-4" >
 
-          <SearchInputBox placeholder='Search Here..' onSearch={handleSearch}  />
-          
-            {/* <Text>{filteredList.length}</Text> */}
-            <FlatList
-              contentContainerStyle={{ paddingBottom:240}}
-              data={filteredList}
-              keyExtractor={(item, index) =>
-                item.id ? item.id.toString() : `index-${index}`
-              }
-              renderItem={({ item }) => (
-                <WomGembaExerciseListCard
-                  objectId={item.objectId}
-                  studyTypeName={item.studyTypeName}
-                  formatedStudyDate={item.formatedStudyDate}
-                  description={item.description}
-                  handlePressOpenExerciseDetail={() =>
-                    handlePressOpenExerciseDetail(item)
-                  }
-                  itemIsCompleted={item.isCompleted}
-                />
-              )}
-              onEndReachedThreshold={0.5}
+          <SearchInputBox placeholder='Search Here..' onSearch={handleSearch} />
 
-            />
-            
-     
+          {/* <Text>{filteredList.length}</Text> */}
+          <FlatList
+            contentContainerStyle={{ paddingBottom: 200 }}
+            data={filteredList}
+            keyExtractor={(item, index) =>
+              item.id ? item.id.toString() : `index-${index}`
+            }
+            renderItem={({ item }) => (
+              <WomGembaExerciseListCard
+                objectId={item.objectId}
+                studyTypeName={item.studyTypeName}
+                formatedStudyDate={item.formatedStudyDate}
+                description={item.description}
+                handlePressOpenExerciseDetail={() =>
+                  handlePressOpenExerciseDetail(item)
+                }
+                itemIsCompleted={item.isCompleted}
+              />
+            )}
+            onEndReachedThreshold={0.5}
+
+          />
+
+
 
 
 
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   floatingButton: {
     position: 'absolute',
-    bottom: 28, // Tailwind's bottom-6
+    bottom: 38, // Tailwind's bottom-6
     left: '50%',
     transform: [{ translateX: -100 }], // Half of button width to center it
     backgroundColor: '#3b82f6', // Blue-500
