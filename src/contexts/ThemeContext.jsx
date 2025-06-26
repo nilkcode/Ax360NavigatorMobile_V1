@@ -4,12 +4,12 @@ import { useColorScheme } from "react-native";
 export const ThemeContext = createContext(); // Ensure it has a default value
 
  const ThemeProvider = ({ children }) => {
-  const deviceTheme = useColorScheme(); // Get system theme
-  const [theme, setTheme] = useState(deviceTheme || "light");
+  // const deviceTheme = useColorScheme(); // Get system theme
+  const [theme, setTheme] = useState("light");
 
-  useEffect(() => {
-    setTheme(deviceTheme); // Sync with system changes
-  }, [deviceTheme]);
+  // useEffect(() => {
+  //   setTheme(deviceTheme); // Sync with system changes
+  // }, [deviceTheme]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));

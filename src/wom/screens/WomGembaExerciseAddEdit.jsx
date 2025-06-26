@@ -370,10 +370,6 @@ const WomGembaExerciseAddEdit = () => {
         }
     }
 
-    // const deleteExercise =  () => {
-
-    //     console.log('delete exercise')
-    // }
 
 
 
@@ -387,7 +383,7 @@ const WomGembaExerciseAddEdit = () => {
 
             Toast.show({
                 type: "success",
-                text1: "Exercise Deleted successfully",
+                text1:success
             });
 
             navigation.navigate('/wom-mob-gemba-exercise-list');
@@ -556,8 +552,7 @@ const WomGembaExerciseAddEdit = () => {
                                         Study Type
                                     </Text>
                                     <Text className="mx-4 text-base text-gray-800">
-                                        {/* {studyType.find(submittedExercise?.studyType || '--').name} */}
-                                        {/* {submittedExercise?.studyType || '--'} */}
+                                     
                                        <Text>{studyTypeName}</Text> 
                                     </Text>
                                 </View>
