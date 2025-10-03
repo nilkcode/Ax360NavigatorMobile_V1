@@ -5,8 +5,7 @@ import CryptoJS from "crypto-js";
 // Constants (You can also move these to .env for better security)
 
 
-let key = CryptoJS.enc.Utf8.parse('1203199320052021');
- let iv = CryptoJS.enc.Utf8.parse('1203199320052021');
+
 
 // Function to encrypt a string
 
